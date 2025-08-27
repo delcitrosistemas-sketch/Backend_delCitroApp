@@ -1,0 +1,289 @@
+-- CreateEnum
+CREATE TYPE "public"."ROLES_GENERALES" AS ENUM ('USUARIO', 'ADMIN', 'GERENTE', 'SUPERVISOR');
+
+-- CreateEnum
+CREATE TYPE "public"."GENEROS" AS ENUM ('MASCULINO', 'FEMENINO');
+
+-- CreateEnum
+CREATE TYPE "public"."ESTADOS_DE_PROCESO" AS ENUM ('CARGA', 'DESCARGA', 'EXTRACCION', 'HOMOGENEANIZACION', 'REFRIGERACION', 'EMPAQUE', 'ENVIADO', 'RECIBIDO', 'ACEPTADO', 'PENDIENTE', 'COMPLETADO', 'CANCELADO', 'RECHAZADO');
+
+-- CreateEnum
+CREATE TYPE "public"."AREAS_GENERALES" AS ENUM ('PROCESO', 'ADMINISTRATIVO', 'CALIDAD', 'REFRIGERACION', 'MANTENIMIENTO', 'ALMACEN', 'LIMPIEZA', 'TRANSPORTE');
+
+-- CreateEnum
+CREATE TYPE "public"."AREAS_DE_PROCESO" AS ENUM ('DESCARGA', 'SELECCION_Y_LAVADO', 'EXTRACCION_JUGO', 'EXTRACCION_PULPA', 'EXTRACCION_ACEITE', 'HOMOGENEANIZACION', 'ENVASADO', 'CASCARILLA', 'PATIO', 'CLORIZACION_AGUA');
+
+-- CreateEnum
+CREATE TYPE "public"."AREAS_DE_CALIDAD" AS ENUM ('LABORATORIO');
+
+-- CreateEnum
+CREATE TYPE "public"."AREAS_ADMINISTRATIVAS" AS ENUM ('FINANZAS', 'SISTEMAS_CALIDAD', 'ASEGURACION_CALIDAD', 'RECURSOS_HUMANOS', 'VENTAS', 'COMPRAS');
+
+-- CreateEnum
+CREATE TYPE "public"."AREAS_ALMACEN" AS ENUM ('MATERIAL_EMPAQUE', 'PRODUCTOS_QUIMICOS', 'PRODUCTOS_TERMINADOS', 'REFACCIONES');
+
+-- CreateTable
+CREATE TABLE "public"."USUARIOS" (
+    "id" SERIAL NOT NULL,
+    "usuario" TEXT NOT NULL,
+    "rol" "public"."ROLES_GENERALES" NOT NULL,
+    "hash" TEXT,
+    "hashedRt" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "USUARIOS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."CLIENTES" (
+    "id" SERIAL NOT NULL,
+    "primer_nombre" TEXT NOT NULL,
+    "segundo_nombre" TEXT NOT NULL,
+    "apellido_paterno" TEXT NOT NULL,
+    "apellido_materno" TEXT NOT NULL,
+    "correo" TEXT NOT NULL,
+    "telefono" TEXT NOT NULL,
+    "direccion" TEXT NOT NULL,
+    "empresa" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "CLIENTES_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."EMPLEADOS" (
+    "id" SERIAL NOT NULL,
+    "primer_nombre" TEXT NOT NULL,
+    "segundo_nombre" TEXT,
+    "apellido_paterno" TEXT,
+    "apellido_materno" TEXT,
+    "correo" TEXT,
+    "telefono" TEXT NOT NULL,
+    "direccion" TEXT,
+    "edad" INTEGER,
+    "genero" "public"."GENEROS" NOT NULL,
+    "area_id" INTEGER NOT NULL,
+    "departamento_id" INTEGER NOT NULL,
+    "puesto_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "EMPLEADOS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."ROLES" (
+    "id" SERIAL NOT NULL,
+    "rol" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ROLES_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."AREAS" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "AREAS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."DEPARTAMENTOS" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "area_id" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "DEPARTAMENTOS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."PUESTOS" (
+    "id" SERIAL NOT NULL,
+    "nombre" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PUESTOS_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."REGISTRO_DESCARGA_FRUTA_PARA_PROCESO" (
+    "id" SERIAL NOT NULL,
+    "folio" INTEGER NOT NULL,
+    "placas_transporte" TEXT NOT NULL,
+    "variedad" TEXT NOT NULL,
+    "inicio_descarga" TIMESTAMP(3) NOT NULL,
+    "fin_descarga" TIMESTAMP(3) NOT NULL,
+    "cant_progra_desca" DOUBLE PRECISION NOT NULL,
+    "cant_real_desca" DOUBLE PRECISION NOT NULL,
+    "observaciones" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "REGISTRO_DESCARGA_FRUTA_PARA_PROCESO_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."REGISTRO_ACEITE_ESCENCIAL" (
+    "id" SERIAL NOT NULL,
+    "proceso_id" INTEGER NOT NULL,
+    "fecha_proceso" TIMESTAMP(3) NOT NULL,
+    "lote" TEXT NOT NULL,
+    "ton_procesadas" DOUBLE PRECISION NOT NULL,
+    "fecha_vaciado" TIMESTAMP(3) NOT NULL,
+    "silo" DOUBLE PRECISION NOT NULL,
+    "inv_inicial" DOUBLE PRECISION NOT NULL,
+    "agregado" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "REGISTRO_ACEITE_ESCENCIAL_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."REGISTRO_EMBARQUES" (
+    "id" SERIAL NOT NULL,
+    "proceso_id" INTEGER NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "cliente_id" INTEGER NOT NULL,
+    "fecha_salida" TIMESTAMP(3) NOT NULL,
+    "lote" TEXT NOT NULL,
+    "embalaje" TEXT,
+    "cantidad" DOUBLE PRECISION NOT NULL,
+    "boleta" INTEGER NOT NULL,
+    "peso_neto" DOUBLE PRECISION,
+    "litros" DOUBLE PRECISION,
+    "galones" DOUBLE PRECISION,
+    "libras_solido" DOUBLE PRECISION,
+    "brix" TEXT,
+    "acidez" DOUBLE PRECISION,
+    "relacion" TEXT,
+    "observaciones" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "REGISTRO_EMBARQUES_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."REGISTRO_SALIDA_PRODUCTO_TERMINADO" (
+    "id" SERIAL NOT NULL,
+    "proceso_id" INTEGER NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "cliente_id" INTEGER NOT NULL,
+    "fecha_envasado" TIMESTAMP(3) NOT NULL,
+    "lote" TEXT NOT NULL,
+    "embalaje" TEXT NOT NULL,
+    "cantidad" DOUBLE PRECISION NOT NULL,
+    "fila_almacen" INTEGER NOT NULL,
+    "peso_neto" DOUBLE PRECISION NOT NULL,
+    "litros" DOUBLE PRECISION NOT NULL,
+    "galones" DOUBLE PRECISION,
+    "libras_solido" DOUBLE PRECISION,
+    "brix" DOUBLE PRECISION,
+    "acidez" DOUBLE PRECISION,
+    "relacion" DOUBLE PRECISION,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "REGISTRO_SALIDA_PRODUCTO_TERMINADO_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."REGISTRO_SALIDA_FRUTA_PROCESADA" (
+    "id" SERIAL NOT NULL,
+    "doc_nro" TEXT NOT NULL,
+    "fecha" TIMESTAMP(3) NOT NULL,
+    "placa" TEXT NOT NULL,
+    "cliente_id" INTEGER NOT NULL,
+    "producto" TEXT NOT NULL,
+    "peso_ingreso" DOUBLE PRECISION NOT NULL,
+    "peso_salida" DOUBLE PRECISION NOT NULL,
+    "peso_neto" DOUBLE PRECISION NOT NULL,
+    "chofer" TEXT NOT NULL,
+    "transportista" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "REGISTRO_SALIDA_FRUTA_PROCESADA_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."CHOFER" (
+    "id" SERIAL NOT NULL,
+    "primer_nombre" TEXT NOT NULL,
+    "segundo_nombre" TEXT,
+    "apellido_paterno" TEXT,
+    "apellido_materno" TEXT,
+    "telefono" TEXT NOT NULL,
+    "direccion" TEXT,
+    "edad" INTEGER,
+    "genero" "public"."GENEROS" NOT NULL,
+    "area_id" INTEGER NOT NULL,
+    "departamento_id" INTEGER NOT NULL,
+    "puesto_id" INTEGER NOT NULL,
+    "vehiculo_id" INTEGER NOT NULL,
+    "placa" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "CHOFER_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "public"."TRANSPORTE" (
+    "id" SERIAL NOT NULL,
+    "vehiculo" TEXT NOT NULL,
+    "tipo" TEXT NOT NULL,
+    "color" TEXT NOT NULL,
+    "placa" TEXT NOT NULL,
+    "ejes" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "TRANSPORTE_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "REGISTRO_DESCARGA_FRUTA_PARA_PROCESO_folio_key" ON "public"."REGISTRO_DESCARGA_FRUTA_PARA_PROCESO"("folio");
+
+-- AddForeignKey
+ALTER TABLE "public"."EMPLEADOS" ADD CONSTRAINT "EMPLEADOS_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "public"."AREAS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."EMPLEADOS" ADD CONSTRAINT "EMPLEADOS_departamento_id_fkey" FOREIGN KEY ("departamento_id") REFERENCES "public"."DEPARTAMENTOS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."EMPLEADOS" ADD CONSTRAINT "EMPLEADOS_puesto_id_fkey" FOREIGN KEY ("puesto_id") REFERENCES "public"."PUESTOS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."DEPARTAMENTOS" ADD CONSTRAINT "DEPARTAMENTOS_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "public"."AREAS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."REGISTRO_EMBARQUES" ADD CONSTRAINT "REGISTRO_EMBARQUES_cliente_id_fkey" FOREIGN KEY ("cliente_id") REFERENCES "public"."CLIENTES"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."REGISTRO_SALIDA_PRODUCTO_TERMINADO" ADD CONSTRAINT "REGISTRO_SALIDA_PRODUCTO_TERMINADO_cliente_id_fkey" FOREIGN KEY ("cliente_id") REFERENCES "public"."CLIENTES"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."REGISTRO_SALIDA_FRUTA_PROCESADA" ADD CONSTRAINT "REGISTRO_SALIDA_FRUTA_PROCESADA_cliente_id_fkey" FOREIGN KEY ("cliente_id") REFERENCES "public"."CLIENTES"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."CHOFER" ADD CONSTRAINT "CHOFER_area_id_fkey" FOREIGN KEY ("area_id") REFERENCES "public"."AREAS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."CHOFER" ADD CONSTRAINT "CHOFER_departamento_id_fkey" FOREIGN KEY ("departamento_id") REFERENCES "public"."DEPARTAMENTOS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."CHOFER" ADD CONSTRAINT "CHOFER_puesto_id_fkey" FOREIGN KEY ("puesto_id") REFERENCES "public"."PUESTOS"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."CHOFER" ADD CONSTRAINT "CHOFER_vehiculo_id_fkey" FOREIGN KEY ("vehiculo_id") REFERENCES "public"."TRANSPORTE"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
