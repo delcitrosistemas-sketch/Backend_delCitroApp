@@ -1,9 +1,10 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
 import { GetCurrentUser, GetCurrentUserId, Public } from 'src/common/decorators';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { Tokens } from './types';
 import { RtGuad } from 'src/common/guards';
+import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -20,9 +21,17 @@ export class AuthController {
   @Public()
   @Post('/local/signin')
   @HttpCode(HttpStatus.OK)
-  signinLocal(@Body() dto: AuthDto): Promise<Tokens> {
-    console.log('Entrando a auth/local/signin');
-    return this.authService.signinLocal(dto);
+  async signinLocal(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response) {
+    const tokens = await this.authService.signinLocal(dto);
+    console.log('Entrando a /local/signin');
+    res.cookie('access_token', tokens.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return { message: 'Login exitoso' };
   }
 
   @Post('/logout')
