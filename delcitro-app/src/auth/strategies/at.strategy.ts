@@ -4,15 +4,15 @@ import { Request } from 'express';
 import { Injectable } from '@nestjs/common';
 
 type JwtPayload = {
-  sub: string;
-  email: string;
+  sub: number;
+  usuario: string;
 };
 
 @Injectable()
 export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([(req: Request) => req?.cookies?.access_token]),
       secretOrKey: 'at-secret',
     });
   }

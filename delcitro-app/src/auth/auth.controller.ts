@@ -26,9 +26,11 @@ export class AuthController {
     console.log('Entrando a /local/signin');
     res.cookie('access_token', tokens.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      //secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       path: '/',
+      maxAge: 1000 * 60 * 15,
     });
 
     return { message: 'Login exitoso' };
@@ -36,10 +38,14 @@ export class AuthController {
 
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
-  logout(@GetCurrentUserId() userId: number) {
+  async logout(@GetCurrentUserId() user: number, @Res({ passthrough: true }) res: Response) {
     console.log('Entrando a auth/local/logout');
+    console.log(' 0 0 0 0 ' + user);
+    await this.authService.logout(user);
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
 
-    return this.authService.logout(userId);
+    return { message: 'Logout exitoso' };
   }
 
   @Public()

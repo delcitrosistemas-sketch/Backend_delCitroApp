@@ -1,11 +1,11 @@
-export interface UsuarioLogIn {
+export class ProfileDto {
+  id: number;
   usuario: string;
-  password: string;
+  rol: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export interface UsuarioRegistro {
+export class FindUserDto {
   usuario: string;
-  role: 'USER';
-  password: string;
-  phone: string;
 }
