@@ -13,15 +13,45 @@ export class UsuariosService {
 
     if (!user) return null;
 
-    // Mapeo manual para no devolver campos sensibles
     const profile: ProfileDto = {
       id: user.id,
       usuario: user.usuario,
       rol: user.rol,
+      avatar: user.avatar || '',
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
 
     return profile;
+  }
+
+  async infoUserProfileById(userId: number) {
+    const user = await this.prisma.uSUARIOS.findUnique({
+      where: { id: userId },
+      select: { id: true, usuario: true, rol: true, avatar: true },
+    });
+
+    if (!user) return null;
+
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001';
+
+    return {
+      ...user,
+      avatar: user.avatar 
+        ? `${backendUrl}/uploads/avatars/${user.avatar}`
+        : null,
+    };
+    
+  }
+
+
+
+  async updateAvatar(userId: number, filename: string) {
+    return this.prisma.uSUARIOS.update({
+      where: { id: userId },
+      data: {
+        avatar: filename,
+      },
+    });
   }
 }

@@ -32,15 +32,13 @@ export class AuthController {
       path: '/',
       maxAge: 1000 * 60 * 15,
     });
-
+    
     return { message: 'Login exitoso' };
   }
 
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
   async logout(@GetCurrentUserId() user: number, @Res({ passthrough: true }) res: Response) {
-    console.log('Entrando a auth/local/logout');
-    console.log(' 0 0 0 0 ' + user);
     await this.authService.logout(user);
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
