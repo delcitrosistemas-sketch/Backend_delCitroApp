@@ -20,7 +20,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed": "ts-node prisma/seed.ts",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:test": "prisma migrate dev --schema=./prisma/schema.prueba.prisma",
+    "generate:test": "prisma generate --schema=./prisma/schema.prueba.prisma",
+    "reset:test": "prisma migrate reset --schema=./prisma/schema.prueba.prisma",
+    "studio:test": "prisma studio --schema=./prisma/schema.prueba.prisma"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",

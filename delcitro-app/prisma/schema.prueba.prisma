@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_PRUEBA_URL")
 }
 
 model USUARIOS {
@@ -71,11 +71,11 @@ model DETALLES_EMPLEADO {
 
     empleado                EMPLEADOS[]
 
-    incidencias             INCIDENCIA          @relation(fields: [incidencia_id], references: [id])
+    incidencias             INCIDENCIAS          @relation(fields: [incidencia_id], references: [id])
 
 }
 
-model INCIDENCIA {
+model INCIDENCIAS {
     id                      Int                         @id @default(autoincrement())
     tipo                    String
     fecha                   DateTime

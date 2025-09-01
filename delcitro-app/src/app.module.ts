@@ -6,10 +6,11 @@ import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './common/guards';
 import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './componets/usuarios/usuarios.module';
+import { EmpleadosModule } from './componets/empleados/empleados.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsuariosModule],
-  exports: [UsuariosModule],
+  imports: [PrismaModule, AuthModule, UsuariosModule, EmpleadosModule],
+  exports: [UsuariosModule, EmpleadosModule],
   controllers: [AppController],
   providers: [
     AppService,
