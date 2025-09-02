@@ -10,12 +10,10 @@ import {
   Post,
   Put,
   Delete,
-
   ParseIntPipe,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Public } from '../../common/decorators/public.decorator';
-
 
 @Controller('empleados')
 export class EmpleadosController {
@@ -37,21 +35,22 @@ export class EmpleadosController {
   }
 
   @Public()
-  @Get(':id')
+  @Get('/buscar/:id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id', ParseIntPipe) id: number) {
+    console.log('Entrando a empleado por id');
     return this.empleadoService.findOne(id);
   }
 
   @Public()
-  @Put(':id')
+  @Put('/editar/:id')
   @HttpCode(HttpStatus.OK)
   async update(@Param('id', ParseIntPipe) id: number, @Body() data: Prisma.USUARIOSUpdateInput) {
     return this.empleadoService.update(id, data);
   }
 
   @Public()
-  @Delete(':id')
+  @Delete('/borrar/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.empleadoService.remove(id);

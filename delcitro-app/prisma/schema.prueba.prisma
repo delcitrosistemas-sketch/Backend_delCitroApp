@@ -17,6 +17,8 @@ model USUARIOS {
     createdAt       DateTime       @default(now())
     updatedAt       DateTime       @default(now())
 
+    @@map("EMPLEAUSUARIOSDOS")
+
 }
 
 model CLIENTES {
@@ -35,6 +37,8 @@ model CLIENTES {
     reg_embarques           REGISTRO_EMBARQUES[]
     reg_salida_prod         REGISTRO_SALIDA_PRODUCTO_TERMINADO[]
     reg_fruta_pros          REGISTRO_SALIDA_FRUTA_PROCESADA[]
+
+    @@map("CLIENTES")
 }
 
 model EMPLEADOS {
@@ -61,6 +65,7 @@ model EMPLEADOS {
     puesto                  PUESTOS             @relation(fields: [puesto_id], references: [id])
     detalles                DETALLES_EMPLEADO   @relation(fields: [detalles_id], references: [id])
 
+    @@map("EMPLEADOS")
 }
 
 model DETALLES_EMPLEADO {
@@ -73,6 +78,7 @@ model DETALLES_EMPLEADO {
 
     incidencias             INCIDENCIAS          @relation(fields: [incidencia_id], references: [id])
 
+    @@("DETALLES_EMPLEADO")
 }
 
 model INCIDENCIAS {
@@ -85,7 +91,8 @@ model INCIDENCIAS {
     updatedAt               DateTime            @default(now())
 
     detalles                DETALLES_EMPLEADO[]
-
+    
+    @@("INCIDENCIAS")
 }
 
 model ROLES {
@@ -94,6 +101,7 @@ model ROLES {
     createdAt       DateTime        @default(now())
     updatedAt       DateTime        @default(now())
     
+    @@("ROLES")
 }
 
 model AREAS {
@@ -105,6 +113,9 @@ model AREAS {
     empleado        EMPLEADOS[]
     departamentos   DEPARTAMENTOS[]
     chofer          CHOFER[]
+
+    @@("AREAS")
+
 }
 
 model DEPARTAMENTOS {
@@ -117,6 +128,9 @@ model DEPARTAMENTOS {
     area            AREAS           @relation(fields: [area_id], references: [id])
     empleado        EMPLEADOS[]
     chofer          CHOFER[]
+
+    @@("DEPARTAMENTOS")
+
 }
 
 model PUESTOS {
@@ -127,6 +141,9 @@ model PUESTOS {
 
     empleado        EMPLEADOS[]
     chofer          CHOFER[]
+
+    @@("PUESTOS")
+
 }
 
 model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
@@ -141,6 +158,9 @@ model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
     observaciones                   String?
     createdAt                       DateTime        @default(now())
     updatedAt                       DateTime        @default(now()) 
+
+    @@("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
+
 }
 
 model REGISTRO_ACEITE_ESCENCIAL {
@@ -155,6 +175,9 @@ model REGISTRO_ACEITE_ESCENCIAL {
     agregado            Float // kg
     createdAt           DateTime        @default(now())
     updatedAt           DateTime        @default(now()) 
+
+    @@("REGISTRO_ACEITE_ESCENCIAL")
+
 }
 
 model REGISTRO_EMBARQUES {
