@@ -8,329 +8,305 @@ datasource db {
 }
 
 model USUARIOS {
-    id Int       @id @default(autoincrement())
-    usuario         String @unique
-    rol             ROLES_GENERALES
-    hash            String
-    hashedRt        String?
-    avatar          String?
-    createdAt       DateTime       @default(now())
-    updatedAt       DateTime       @default(now())
-
+  id        Int             @id @default(autoincrement())
+  usuario   String          @unique
+  rol       ROLES_GENERALES
+  hash      String
+  hashedRt  String?
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @default(now())
+  avatar    String?
 }
 
 model CLIENTES {
-    id                      Int             @id @default(autoincrement())
-    primer_nombre           String
-    segundo_nombre          String
-    apellido_paterno        String
-    apellido_materno        String
-    correo                  String
-    telefono                String 
-    direccion               String
-    empresa                 String
-    createdAt               DateTime        @default(now())
-    updatedAt               DateTime        @default(now())
-
-    reg_embarques           REGISTRO_EMBARQUES[]
-    reg_salida_prod         REGISTRO_SALIDA_PRODUCTO_TERMINADO[]
-    reg_fruta_pros          REGISTRO_SALIDA_FRUTA_PROCESADA[]
+  id               Int                                  @id @default(autoincrement())
+  primer_nombre    String
+  segundo_nombre   String
+  apellido_paterno String
+  apellido_materno String
+  correo           String
+  telefono         String
+  direccion        String
+  empresa          String
+  createdAt        DateTime                             @default(now())
+  updatedAt        DateTime                             @default(now())
+  reg_embarques    REGISTRO_EMBARQUES[]
+  reg_fruta_pros   REGISTRO_SALIDA_FRUTA_PROCESADA[]
+  reg_salida_prod  REGISTRO_SALIDA_PRODUCTO_TERMINADO[]
 }
 
 model EMPLEADOS {
-    id                      Int                         @id @default(autoincrement())
-    primer_nombre           String
-    segundo_nombre          String?
-    apellido_paterno        String?
-    apellido_materno        String?
-    correo                  String?
-    telefono                String
-    direccion               String?
-    edad                    Int?
-    genero                  GENEROS
-    status                  String              @default("Activo")
-    area_id                 Int
-    departamento_id         Int
-    puesto_id               Int
-    detalles_id             Int
-    createdAt               DateTime            @default(now())
-    updatedAt               DateTime            @default(now())
-
-    area_asignada           AREAS               @relation(fields: [area_id], references: [id])
-    departamento            DEPARTAMENTOS       @relation(fields: [departamento_id], references: [id])
-    puesto                  PUESTOS             @relation(fields: [puesto_id], references: [id])
-    detalles                DETALLES_EMPLEADO   @relation(fields: [detalles_id], references: [id])
-
+  id               Int               @id @default(autoincrement())
+  primer_nombre    String
+  segundo_nombre   String?
+  apellido_paterno String?
+  apellido_materno String?
+  correo           String?
+  telefono         String
+  direccion        String?
+  edad             Int?
+  genero           GENEROS
+  area_id          Int
+  departamento_id  Int
+  puesto_id        Int
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @default(now())
+  detalles_id      Int
+  status           String            @default("Activo")
+  area_asignada    AREAS             @relation(fields: [area_id], references: [id])
+  departamento     DEPARTAMENTOS     @relation(fields: [departamento_id], references: [id])
+  detalles         DETALLES_EMPLEADO @relation(fields: [detalles_id], references: [id])
+  puesto           PUESTOS           @relation(fields: [puesto_id], references: [id])
 }
 
 model DETALLES_EMPLEADO {
-    id                      Int                         @id @default(autoincrement())
-    incidencia_id           Int
-    createdAt               DateTime            @default(now())
-    updatedAt               DateTime            @default(now())
-
-    empleado                EMPLEADOS[]
-
-    incidencias             INCIDENCIA          @relation(fields: [incidencia_id], references: [id])
-
+  id            Int         @id @default(autoincrement())
+  incidencia_id Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @default(now())
+  incidencias   INCIDENCIA  @relation(fields: [incidencia_id], references: [id])
+  empleado      EMPLEADOS[]
 }
 
 model INCIDENCIA {
-    id                      Int                         @id @default(autoincrement())
-    tipo                    String
-    fecha                   DateTime
-    
-    
-    createdAt               DateTime            @default(now())
-    updatedAt               DateTime            @default(now())
-
-    detalles                DETALLES_EMPLEADO[]
-
+  id        Int                 @id @default(autoincrement())
+  tipo      String
+  fecha     DateTime
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @default(now())
+  detalles  DETALLES_EMPLEADO[]
 }
 
 model ROLES {
-    id              Int             @id @default(autoincrement())
-    rol             String
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @default(now())
-    
+  id        Int      @id @default(autoincrement())
+  rol       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }
 
 model AREAS {
-    id              Int             @id @default(autoincrement())
-    nombre          String
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @default(now()) 
-
-    empleado        EMPLEADOS[]
-    departamentos   DEPARTAMENTOS[]
-    chofer          CHOFER[]
+  id            Int             @id @default(autoincrement())
+  nombre        String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now())
+  chofer        CHOFER[]
+  departamentos DEPARTAMENTOS[]
+  empleado      EMPLEADOS[]
 }
 
 model DEPARTAMENTOS {
-    id              Int             @id @default(autoincrement())
-    nombre          String
-    area_id         Int
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @default(now())
-    
-    area            AREAS           @relation(fields: [area_id], references: [id])
-    empleado        EMPLEADOS[]
-    chofer          CHOFER[]
+  id        Int         @id @default(autoincrement())
+  nombre    String
+  area_id   Int
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
+  chofer    CHOFER[]
+  area      AREAS       @relation(fields: [area_id], references: [id])
+  empleado  EMPLEADOS[]
 }
 
 model PUESTOS {
-    id              Int             @id @default(autoincrement())
-    nombre          String
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @default(now()) 
-
-    empleado        EMPLEADOS[]
-    chofer          CHOFER[]
+  id        Int         @id @default(autoincrement())
+  nombre    String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
+  chofer    CHOFER[]
+  empleado  EMPLEADOS[]
 }
 
 model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
-    id                              Int             @id @default(autoincrement())
-    folio                           Int             @unique
-    placas_transporte               String
-    variedad                        String
-    inicio_descarga                 DateTime
-    fin_descarga                    DateTime
-    cant_progra_desca               Float
-    cant_real_desca                 Float
-    observaciones                   String?
-    createdAt                       DateTime        @default(now())
-    updatedAt                       DateTime        @default(now()) 
+  id                Int      @id @default(autoincrement())
+  folio             Int      @unique
+  placas_transporte String
+  variedad          String
+  inicio_descarga   DateTime
+  fin_descarga      DateTime
+  cant_progra_desca Float
+  cant_real_desca   Float
+  observaciones     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
 }
 
 model REGISTRO_ACEITE_ESCENCIAL {
-    id                  Int             @id @default(autoincrement())
-    proceso_id          Int             
-    fecha_proceso       DateTime
-    lote                String
-    ton_procesadas      Float   
-    fecha_vaciado       DateTime
-    silo                Float // litros
-    inv_inicial         Float // kg
-    agregado            Float // kg
-    createdAt           DateTime        @default(now())
-    updatedAt           DateTime        @default(now()) 
+  id             Int      @id @default(autoincrement())
+  proceso_id     Int
+  fecha_proceso  DateTime
+  lote           String
+  ton_procesadas Float
+  fecha_vaciado  DateTime
+  silo           Float
+  inv_inicial    Float
+  agregado       Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
 }
 
 model REGISTRO_EMBARQUES {
-    id                  Int             @id @default(autoincrement())
-    proceso_id          Int
-    tipo                String
-    cliente_id            Int
-    fecha_salida        DateTime
-    lote                String
-    embalaje            String?
-    cantidad            Float
-    boleta              Int // numero de boleta
-    peso_neto           Float?
-    litros              Float?
-    galones             Float?
-    libras_solido       Float?
-    brix                String?
-    acidez              Float?
-    relacion            String?
-    observaciones       String?
-    createdAt           DateTime        @default(now())
-    updatedAt           DateTime        @default(now()) 
-
-    empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
+  id            Int      @id @default(autoincrement())
+  proceso_id    Int
+  tipo          String
+  cliente_id    Int
+  fecha_salida  DateTime
+  lote          String
+  embalaje      String?
+  cantidad      Float
+  boleta        Int
+  peso_neto     Float?
+  litros        Float?
+  galones       Float?
+  libras_solido Float?
+  brix          String?
+  acidez        Float?
+  relacion      String?
+  observaciones String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  empresa       CLIENTES @relation(fields: [cliente_id], references: [id])
 }
 
 model REGISTRO_SALIDA_PRODUCTO_TERMINADO {
-    id                  Int             @id @default(autoincrement())
-    proceso_id          Int
-    tipo                String
-    cliente_id             Int
-    fecha_envasado      DateTime
-    lote                String
-    embalaje            String
-    cantidad            Float // 
-    fila_almacen        Int
-    peso_neto           Float
-    litros              Float
-    galones             Float?
-    libras_solido       Float?
-    brix                Float?
-    acidez              Float?
-    relacion            Float?
-    createdAt           DateTime        @default(now())
-    updatedAt           DateTime        @default(now()) 
-
-    empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
-
+  id             Int      @id @default(autoincrement())
+  proceso_id     Int
+  tipo           String
+  cliente_id     Int
+  fecha_envasado DateTime
+  lote           String
+  embalaje       String
+  cantidad       Float
+  fila_almacen   Int
+  peso_neto      Float
+  litros         Float
+  galones        Float?
+  libras_solido  Float?
+  brix           Float?
+  acidez         Float?
+  relacion       Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now())
+  empresa        CLIENTES @relation(fields: [cliente_id], references: [id])
 }
 
 model REGISTRO_SALIDA_FRUTA_PROCESADA {
-    id                  Int             @id @default(autoincrement())
-    doc_nro             String
-    fecha               DateTime
-    placa               String
-    cliente_id            Int
-    producto            String
-    peso_ingreso        Float
-    peso_salida         Float
-    peso_neto           Float
-    chofer              String
-    transportista       String
-    createdAt           DateTime        @default(now())
-    updatedAt           DateTime        @default(now()) 
-
-    empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
-
+  id            Int      @id @default(autoincrement())
+  doc_nro       String
+  fecha         DateTime
+  placa         String
+  cliente_id    Int
+  producto      String
+  peso_ingreso  Float
+  peso_salida   Float
+  peso_neto     Float
+  chofer        String
+  transportista String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now())
+  empresa       CLIENTES @relation(fields: [cliente_id], references: [id])
 }
 
 model CHOFER {
-    id                      Int                 @id @default(autoincrement())
-    primer_nombre           String
-    segundo_nombre          String?
-    apellido_paterno        String?
-    apellido_materno        String?
-    telefono                String
-    direccion               String?
-    edad                    Int?
-    genero                  GENEROS
-    area_id                 Int
-    departamento_id         Int
-    puesto_id               Int // Chofer
-    vehiculo_id             Int // Transporte
-    placa                   String
-    createdAt               DateTime            @default(now())
-    updatedAt               DateTime            @default(now())
-
-    area                    AREAS               @relation(fields: [area_id], references: [id])
-    departamento            DEPARTAMENTOS       @relation(fields: [departamento_id], references: [id])
-    puesto                  PUESTOS             @relation(fields: [puesto_id], references: [id])
-    vehiculo                TRANSPORTE          @relation(fields: [vehiculo_id], references: [id])          
+  id               Int           @id @default(autoincrement())
+  primer_nombre    String
+  segundo_nombre   String?
+  apellido_paterno String?
+  apellido_materno String?
+  telefono         String
+  direccion        String?
+  edad             Int?
+  genero           GENEROS
+  area_id          Int
+  departamento_id  Int
+  puesto_id        Int
+  vehiculo_id      Int
+  placa            String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now())
+  area             AREAS         @relation(fields: [area_id], references: [id])
+  departamento     DEPARTAMENTOS @relation(fields: [departamento_id], references: [id])
+  puesto           PUESTOS       @relation(fields: [puesto_id], references: [id])
+  vehiculo         TRANSPORTE    @relation(fields: [vehiculo_id], references: [id])
 }
 
 model TRANSPORTE {
-    id                      Int                 @id @default(autoincrement())
-    vehiculo                String
-    tipo                    String
-    color                   String
-    placa                   String
-    ejes                    Float
-    createdAt               DateTime            @default(now())
-    updatedAt               DateTime            @default(now())
-
-    chofer                  CHOFER[]
+  id        Int      @id @default(autoincrement())
+  vehiculo  String
+  tipo      String
+  color     String
+  placa     String
+  ejes      Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  chofer    CHOFER[]
 }
 
-// Datos que deben estar en las tablas
-
 enum ROLES_GENERALES {
-    USUARIO
-    ADMIN
-    GERENTE
-    SUPERVISOR
+  USUARIO
+  ADMIN
+  GERENTE
+  SUPERVISOR
 }
 
 enum GENEROS {
-    MASCULINO
-    FEMENINO
+  MASCULINO
+  FEMENINO
 }
 
 enum ESTADOS_DE_PROCESO {
-    CARGA
-    DESCARGA
-    EXTRACCION
-    HOMOGENEANIZACION
-    REFRIGERACION
-    EMPAQUE
-    ENVIADO
-    RECIBIDO
-    ACEPTADO
-    PENDIENTE
-    COMPLETADO
-    CANCELADO
-    RECHAZADO
+  CARGA
+  DESCARGA
+  EXTRACCION
+  HOMOGENEANIZACION
+  REFRIGERACION
+  EMPAQUE
+  ENVIADO
+  RECIBIDO
+  ACEPTADO
+  PENDIENTE
+  COMPLETADO
+  CANCELADO
+  RECHAZADO
 }
 
 enum AREAS_GENERALES {
-    PROCESO
-    ADMINISTRATIVO
-    CALIDAD
-    REFRIGERACION
-    MANTENIMIENTO
-    ALMACEN
-    LIMPIEZA
-    TRANSPORTE
+  PROCESO
+  ADMINISTRATIVO
+  CALIDAD
+  REFRIGERACION
+  MANTENIMIENTO
+  ALMACEN
+  LIMPIEZA
+  TRANSPORTE
 }
 
 enum AREAS_DE_PROCESO {
-    DESCARGA
-    SELECCION_Y_LAVADO
-    EXTRACCION_JUGO
-    EXTRACCION_PULPA
-    EXTRACCION_ACEITE
-    HOMOGENEANIZACION
-    ENVASADO
-    CASCARILLA
-    PATIO
-    CLORIZACION_AGUA
+  DESCARGA
+  SELECCION_Y_LAVADO
+  EXTRACCION_JUGO
+  EXTRACCION_PULPA
+  EXTRACCION_ACEITE
+  HOMOGENEANIZACION
+  ENVASADO
+  CASCARILLA
+  PATIO
+  CLORIZACION_AGUA
 }
 
 enum AREAS_DE_CALIDAD {
-    LABORATORIO
+  LABORATORIO
 }
 
 enum AREAS_ADMINISTRATIVAS {
-    FINANZAS
-    SISTEMAS_CALIDAD
-    ASEGURACION_CALIDAD
-    RECURSOS_HUMANOS
-    VENTAS
-    COMPRAS
+  FINANZAS
+  SISTEMAS_CALIDAD
+  ASEGURACION_CALIDAD
+  RECURSOS_HUMANOS
+  VENTAS
+  COMPRAS
 }
 
 enum AREAS_ALMACEN {
-    MATERIAL_EMPAQUE
-    PRODUCTOS_QUIMICOS
-    PRODUCTOS_TERMINADOS
-    REFACCIONES
+  MATERIAL_EMPAQUE
+  PRODUCTOS_QUIMICOS
+  PRODUCTOS_TERMINADOS
+  REFACCIONES
 }

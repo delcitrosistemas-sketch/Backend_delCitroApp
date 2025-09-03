@@ -17,7 +17,7 @@ model USUARIOS {
     createdAt       DateTime       @default(now())
     updatedAt       DateTime       @default(now())
 
-    @@map("EMPLEAUSUARIOSDOS")
+    @@map("USUARIOS")
 
 }
 
@@ -78,7 +78,7 @@ model DETALLES_EMPLEADO {
 
     incidencias             INCIDENCIAS          @relation(fields: [incidencia_id], references: [id])
 
-    @@("DETALLES_EMPLEADO")
+    @@map("DETALLES_EMPLEADO")
 }
 
 model INCIDENCIAS {
@@ -92,7 +92,7 @@ model INCIDENCIAS {
 
     detalles                DETALLES_EMPLEADO[]
     
-    @@("INCIDENCIAS")
+    @@map("INCIDENCIAS")
 }
 
 model ROLES {
@@ -101,7 +101,7 @@ model ROLES {
     createdAt       DateTime        @default(now())
     updatedAt       DateTime        @default(now())
     
-    @@("ROLES")
+    @@map("ROLES")
 }
 
 model AREAS {
@@ -114,7 +114,7 @@ model AREAS {
     departamentos   DEPARTAMENTOS[]
     chofer          CHOFER[]
 
-    @@("AREAS")
+    @@map("AREAS")
 
 }
 
@@ -129,7 +129,7 @@ model DEPARTAMENTOS {
     empleado        EMPLEADOS[]
     chofer          CHOFER[]
 
-    @@("DEPARTAMENTOS")
+    @@map("DEPARTAMENTOS")
 
 }
 
@@ -142,7 +142,7 @@ model PUESTOS {
     empleado        EMPLEADOS[]
     chofer          CHOFER[]
 
-    @@("PUESTOS")
+    @@map("PUESTOS")
 
 }
 
@@ -159,7 +159,7 @@ model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
     createdAt                       DateTime        @default(now())
     updatedAt                       DateTime        @default(now()) 
 
-    @@("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
+    @@map("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
 
 }
 
@@ -176,7 +176,7 @@ model REGISTRO_ACEITE_ESCENCIAL {
     createdAt           DateTime        @default(now())
     updatedAt           DateTime        @default(now()) 
 
-    @@("REGISTRO_ACEITE_ESCENCIAL")
+    @@map("REGISTRO_ACEITE_ESCENCIAL")
 
 }
 

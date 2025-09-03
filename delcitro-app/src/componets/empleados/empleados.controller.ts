@@ -11,6 +11,7 @@ import {
   Put,
   Delete,
   ParseIntPipe,
+  Patch,
 } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { Public } from '../../common/decorators/public.decorator';
@@ -35,7 +36,7 @@ export class EmpleadosController {
   }
 
   @Public()
-  @Get('/buscar/:id')
+  @Get('/find/:id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id', ParseIntPipe) id: number) {
     console.log('Entrando a empleado por id');
@@ -45,14 +46,22 @@ export class EmpleadosController {
   @Public()
   @Put('/editar/:id')
   @HttpCode(HttpStatus.OK)
-  async update(@Param('id', ParseIntPipe) id: number, @Body() data: Prisma.USUARIOSUpdateInput) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
+    console.log(' 000000000000 ' + JSON.stringify(data));
     return this.empleadoService.update(id, data);
   }
 
   @Public()
-  @Delete('/borrar/:id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number) {
-    return this.empleadoService.remove(id);
+  @Patch('/dar-baja/:id')
+  @HttpCode(HttpStatus.OK)
+  async darDeBaja(@Param('id', ParseIntPipe) id: number) {
+    return this.empleadoService.darDeBaja(id);
+  }
+
+  @Public()
+  @Patch('/reactivar/:id')
+  @HttpCode(HttpStatus.OK)
+  async reactivar(@Param('id', ParseIntPipe) id: number) {
+    return this.empleadoService.reactivar(id);
   }
 }
