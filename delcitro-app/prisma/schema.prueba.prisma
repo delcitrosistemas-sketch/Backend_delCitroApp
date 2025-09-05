@@ -43,6 +43,7 @@ model CLIENTES {
 
 model EMPLEADOS {
     id                      Int                         @id @default(autoincrement())
+    num_emp                 Int                         @default(autoincrement())
     primer_nombre           String
     segundo_nombre          String?
     apellido_paterno        String?
@@ -296,6 +297,7 @@ enum ROLES_GENERALES {
 enum GENEROS {
     MASCULINO
     FEMENINO
+    OTROS
 }
 
 enum ESTADOS_DE_PROCESO {

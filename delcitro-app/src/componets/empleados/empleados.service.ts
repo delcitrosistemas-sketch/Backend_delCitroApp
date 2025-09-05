@@ -8,21 +8,30 @@ export class EmpleadosService {
   constructor(private prisma: PrismaService) {}
 
   private areaMap: Record<string, number> = {
-    "Ventas": 1,
-    "Producción": 2,
+    "Producción": 1,
+    "Ventas": 2,
     "Logística": 3,
+    "Tecnología": 4,
+    "Marketing": 5,
+    "Transporte": 6,
   };
 
   private departamentoMap: Record<string, number> = {
-    "Calidad": 1,
+    "Mantenimiento": 1,
     "Recursos Humanos": 2,
-    "Finanzas": 3,
+    "Calidad": 3,
+    "Sistemas": 4,
+    "Finanzas": 5,
+    "Mejora Continua": 6,
   };
 
   private puestoMap: Record<string, number> = {
     "Gerente": 1,
     "Supervisor": 2,
     "Operador": 3,
+    "Apoyo": 4,
+    "Limpieza": 5,
+    "Chofer": 6,
   };
 
   async create(data: Prisma.EMPLEADOSCreateInput) {
@@ -190,5 +199,35 @@ export class EmpleadosService {
         updatedAt: new Date(),
       },
     });
+  }
+
+  async areas() {
+    const areas = await this.prisma.aREAS.findMany({
+      select: {
+        nombre: true,
+      },
+    });
+
+    return areas.map((area) => area.nombre);
+  }
+
+  async departamentos() {
+    const dep = await this.prisma.dEPARTAMENTOS.findMany({
+      select: {
+        nombre: true,
+      },
+    });
+
+    return dep.map((dep) => dep.nombre);
+  }
+
+  async puestos() {
+    const puesto = await this.prisma.pUESTOS.findMany({
+      select: {
+        nombre: true,
+      },
+    });
+
+    return puesto.map((puesto) => puesto.nombre);
   }
 }

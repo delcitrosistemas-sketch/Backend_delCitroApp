@@ -64,4 +64,25 @@ export class EmpleadosController {
   async reactivar(@Param('id', ParseIntPipe) id: number) {
     return this.empleadoService.reactivar(id);
   }
+
+  @Public()
+  @Get('/get-areas')
+  @HttpCode(HttpStatus.OK)
+  async getAreas() {
+    return this.empleadoService.areas();
+  }
+
+  @Public()
+  @Get('/get-departamentos')
+  @HttpCode(HttpStatus.OK)
+  async getDepartamentos() {
+    return this.empleadoService.departamentos();
+  }
+
+  @Public()
+  @Get('/get-puestos')
+  @HttpCode(HttpStatus.OK)
+  async getPuestos() {
+    return this.empleadoService.puestos();
+  }
 }
