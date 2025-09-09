@@ -13,6 +13,7 @@ async function main() {
     ),
   );
 */
+/*
   // --- AREAS ---
   const areas = await Promise.all(
     ['Producción', 'Ventas', 'Logística'].map((nombre) =>
@@ -38,7 +39,7 @@ async function main() {
       prisma.pUESTOS.create({ data: { nombre } }),
     ),
   );
-
+*/
   /*
   // --- USUARIOS ---
   for (let i = 0; i < 10; i++) {
@@ -69,7 +70,7 @@ async function main() {
   }
 
 */
-
+/*
   // --- INCIDENCIAS ---
   const incidencias: { id: number }[] = []; // ✅ tipado explícito
   for (let i = 0; i < 5; i++) {
@@ -110,6 +111,22 @@ async function main() {
         departamentos[Math.floor(Math.random() * departamentos.length)].id,
         puesto_id: puestos[Math.floor(Math.random() * puestos.length)].id,
         detalles_id: detalle.id,
+      },
+    });
+  }
+*/
+
+  // --- DOCUMENTOS_SGC ---
+  for (let i = 0; i < 10; i++) {
+    await prisma.dOCUMENTOS_SGC.create({
+      data: {
+        tipo: faker.book.genre(),
+        archivo: faker.book.format(),
+        nombre: faker.book.publisher(),
+        titulo: faker.book.title(),
+        descripcion: faker.book.series(),
+        archivoUrl: faker.image.url(),
+        extension: faker.book.format(),
       },
     });
   }

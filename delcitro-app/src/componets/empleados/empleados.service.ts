@@ -119,7 +119,6 @@ export class EmpleadosService {
   async update(id: number, dto: UpdateEmpleadoDto) {
     await this.findOne(id);
 
-    // Validación de área
     if (dto.area_id && typeof dto.area_id === 'string') {
       const areaId = this.areaMap[dto.area_id];
       if (!areaId) {
@@ -128,7 +127,6 @@ export class EmpleadosService {
       dto.area_id = areaId;
     }
 
-    // Validación de departamento
     if (dto.departamento_id && typeof dto.departamento_id === 'string') {
       const deptoId = this.departamentoMap[dto.departamento_id];
       if (!deptoId) {
@@ -137,7 +135,6 @@ export class EmpleadosService {
       dto.departamento_id = deptoId;
     }
 
-    // Validación de puesto
     if (dto.puesto_id && typeof dto.puesto_id === 'string') {
       const puestoId = this.puestoMap[dto.puesto_id];
       if (!puestoId) {
@@ -155,11 +152,10 @@ export class EmpleadosService {
       telefono: dto.telefono,
       direccion: dto.direccion,
       edad: dto.edad,
-      genero: dto.genero as any, // si usas ENUM
+      genero: dto.genero as any,
       status: dto.status,
       updatedAt: new Date(),
 
-      // 👇 Relaciones (convertimos los *_id a connect)
       ...(dto.area_id && {
         area_asignada: { connect: { id: dto.area_id } },
       }),

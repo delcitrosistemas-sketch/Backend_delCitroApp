@@ -8,7 +8,7 @@ datasource db {
 }
 
 model USUARIOS {
-    id Int       @id @default(autoincrement())
+    id              Int       @id @default(autoincrement())
     usuario         String @unique
     rol             ROLES_GENERALES
     hash            String
@@ -16,6 +16,8 @@ model USUARIOS {
     avatar          String?
     createdAt       DateTime       @default(now())
     updatedAt       DateTime       @default(now())
+
+    archivosSGC     DOCUMENTOS_SGC[]
 
     @@map("USUARIOS")
 
@@ -86,8 +88,7 @@ model INCIDENCIAS {
     id                      Int                         @id @default(autoincrement())
     tipo                    String
     fecha                   DateTime
-    
-    
+
     createdAt               DateTime            @default(now())
     updatedAt               DateTime            @default(now())
 
@@ -203,6 +204,9 @@ model REGISTRO_EMBARQUES {
     updatedAt           DateTime        @default(now()) 
 
     empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
+
+    @@map("REGISTRO_EMBARQUES")
+
 }
 
 model REGISTRO_SALIDA_PRODUCTO_TERMINADO {
@@ -227,6 +231,8 @@ model REGISTRO_SALIDA_PRODUCTO_TERMINADO {
 
     empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
 
+    @@map("REGISTRO_SALIDA_PRODUCTO_TERMINADO")
+
 }
 
 model REGISTRO_SALIDA_FRUTA_PROCESADA {
@@ -245,6 +251,8 @@ model REGISTRO_SALIDA_FRUTA_PROCESADA {
     updatedAt           DateTime        @default(now()) 
 
     empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
+
+    @@map("REGISTRO_SALIDA_FRUTA_PROCESADA")
 
 }
 
@@ -270,6 +278,9 @@ model CHOFER {
     departamento            DEPARTAMENTOS       @relation(fields: [departamento_id], references: [id])
     puesto                  PUESTOS             @relation(fields: [puesto_id], references: [id])
     vehiculo                TRANSPORTE          @relation(fields: [vehiculo_id], references: [id])          
+    
+    @@map("CHOFER")
+
 }
 
 model TRANSPORTE {
@@ -283,6 +294,28 @@ model TRANSPORTE {
     updatedAt               DateTime            @default(now())
 
     chofer                  CHOFER[]
+
+    @@map("TRANSPORTE")
+
+}
+
+model DOCUMENTOS_SGC {
+    id                      Int                 @id @default(autoincrement())
+    tipo                    String
+    archivo                 String
+    nombre                  String
+    titulo                  String
+    descripcion             String?
+    archivoUrl              String    
+    extension               String?    
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+    usuario_id              Int?
+
+    usuario       USUARIOS? @relation(fields: [usuario_id], references: [id])
+
+    @@map("DOCUMENTOS_SGC")
+
 }
 
 // Datos que deben estar en las tablas
