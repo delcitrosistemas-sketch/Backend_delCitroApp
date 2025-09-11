@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateEmpleadoDto } from '../models/empleados.model';
+import { UpdateEmpleadoDto } from '../models/Empleados.model';
 
 @Injectable()
 export class EmpleadosService {
@@ -66,6 +66,7 @@ export class EmpleadosService {
 
     return empleados.map((empleado) => ({
       id: empleado.id,
+      num_emp: empleado.num_emp,
       primer_nombre: empleado.primer_nombre,
       segundo_nombre: empleado.segundo_nombre,
       apellido_paterno: empleado.apellido_paterno,

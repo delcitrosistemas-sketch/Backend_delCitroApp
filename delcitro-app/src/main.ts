@@ -20,7 +20,7 @@ async function bootstrap() {
   app.useGlobalGuards(new AtGuard(reflector));
   app.use(cookieParser());
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/', // las imágenes estarán disponibles en http://localhost:3001/uploads/
+    prefix: '/uploads/',
   });
   //app.useGlobalGuards(app.get(AtGuard));
   await app.listen(3001);

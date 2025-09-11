@@ -43,6 +43,24 @@ model CLIENTES {
     @@map("CLIENTES")
 }
 
+model PROVEEDORES {
+    id                      Int             @id @default(autoincrement())
+    nombre                  String?
+    empresa                 String
+    direccion               String?
+    estado                  String
+    codigoPostal            String?
+    pais                    String          @default("México")
+    telefono                String
+    email                   String?
+    createdAt               DateTime        @default(now())
+    updatedAt               DateTime        @default(now())
+
+    reg_entrada_fruta       REGISTRO_DESCARGA_FRUTA_PARA_PROCESO[]
+
+    @@map("PROVEEDORES")
+}
+
 model EMPLEADOS {
     id                      Int                         @id @default(autoincrement())
     num_emp                 Int                         @default(autoincrement())
@@ -150,19 +168,42 @@ model PUESTOS {
 
 model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
     id                              Int             @id @default(autoincrement())
-    folio                           Int             @unique
+    folio                           String             @unique
+    fecha                           DateTime
+    boleta                          Int
     placas_transporte               String
     variedad                        String
-    inicio_descarga                 DateTime
-    fin_descarga                    DateTime
-    cant_progra_desca               Float
-    cant_real_desca                 Float
-    observaciones                   String?
+    destino                         String
+    inicio_descarga                 DateTime?
+    fin_descarga                    DateTime?
+    cant_progra_desca               Float?
+    cant_real_desca                 Float?
+    proveedor_id                    Int
+    detalles_id                     Int
     createdAt                       DateTime        @default(now())
     updatedAt                       DateTime        @default(now()) 
 
+    proveedor       PROVEEDORES     @relation(fields: [proveedor_id], references: [id])
+    detalles        DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO     @relation(fields: [detalles_id], references: [id])
+
     @@map("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
 
+}
+
+model DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
+    id                              Int             @id @default(autoincrement())
+    bins                            Int?
+    jaula                           String?
+    huerta                          String? 
+    observaciones                   String?
+    muestra_id                      Int?   
+    createdAt                       DateTime        @default(now())
+    updatedAt                       DateTime        @default(now()) 
+
+    muestreo                MUESTREOS? @relation(fields: [muestra_id], references: [id])
+    registro_fruta          REGISTRO_DESCARGA_FRUTA_PARA_PROCESO[]   
+
+    @@map("DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
 }
 
 model REGISTRO_ACEITE_ESCENCIAL {
@@ -315,7 +356,32 @@ model DOCUMENTOS_SGC {
     usuario       USUARIOS? @relation(fields: [usuario_id], references: [id])
 
     @@map("DOCUMENTOS_SGC")
+}
 
+model MUESTREOS {
+    id                      Int                 @id @default(autoincrement())
+    fecha                   DateTime
+    proveedor_id            Int
+    huertero                String?
+    lote                    String
+    cuidad                  String
+    estado                  String
+    ton_aprox               Float?
+    bta                     Float
+    acidez                  Float
+    rto                     Float
+    rendimiento             Float
+    sabor                   String
+    color                   String
+    aceite                  Float?
+    observaciones           String?
+    analizo                 String
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    registro            DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO[]   
+
+    @@map("MUESTREOS")
 }
 
 // Datos que deben estar en las tablas

@@ -82,4 +82,10 @@ export class DocumentosCalidadController {
   async findAllCategories() {
     return this.service.findAllCategories();
   }
+
+  @Public()
+  @Get('/getAll-categories/count')
+  async findAllCategoriesCount() {
+    return this.service.findAllCategoriesCount();
+  }
 }

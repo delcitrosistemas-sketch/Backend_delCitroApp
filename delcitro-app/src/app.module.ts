@@ -8,10 +8,26 @@ import { AuthModule } from './auth/auth.module';
 import { UsuariosModule } from './componets/usuarios/usuarios.module';
 import { EmpleadosModule } from './componets/empleados/empleados.module';
 import { DocumentosCalidadModule } from './componets/documentos-calidad/documentos-calidad.module';
+import { RegEntraFrutaModule } from './componets/registro-entrada-fruta/reg_entra_fruta/reg_entra_fruta.module';
+import { MuestreosModule } from './componets/muestreos/muestreos.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UsuariosModule, EmpleadosModule, DocumentosCalidadModule],
-  exports: [UsuariosModule, EmpleadosModule, DocumentosCalidadModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    UsuariosModule,
+    EmpleadosModule,
+    DocumentosCalidadModule,
+    RegEntraFrutaModule,
+    MuestreosModule,
+  ],
+  exports: [
+    UsuariosModule,
+    EmpleadosModule,
+    DocumentosCalidadModule,
+    RegEntraFrutaModule,
+    MuestreosModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,
