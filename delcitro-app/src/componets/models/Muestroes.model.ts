@@ -4,7 +4,7 @@ export class CreateMuestreoDto {
   proveedor_id: number;
   huertero?: string;
   lote: string;
-  cuidad: string;
+  ciudad: string;
   estado: string;
   ton_aprox?: number;
   bta: number;

@@ -122,7 +122,7 @@ async function main() {
         proveedor_id: proveedor.id,
         huertero: faker.person.fullName(),
         lote: `LOTE-${faker.number.int({ min: 100, max: 999 })}`,
-        cuidad: ciudades[Math.floor(Math.random() * ciudades.length)],
+        ciudad: ciudades[Math.floor(Math.random() * ciudades.length)],
         estado: estados[Math.floor(Math.random() * estados.length)],
         ton_aprox: faker.number.float({ min: 50, max: 200, fractionDigits: 1 }),
         bta: faker.number.float({ min: 8.0, max: 12.5, fractionDigits: 2 }),

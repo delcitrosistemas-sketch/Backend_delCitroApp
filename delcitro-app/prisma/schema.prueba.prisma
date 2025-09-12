@@ -172,6 +172,7 @@ model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
     fecha                           DateTime
     boleta                          Int
     placas_transporte               String
+    chofer                          String?
     variedad                        String
     destino                         String
     inicio_descarga                 DateTime?
@@ -312,6 +313,7 @@ model CHOFER {
     puesto_id               Int // Chofer
     vehiculo_id             Int // Transporte
     placa                   String
+    empresa                 String?
     createdAt               DateTime            @default(now())
     updatedAt               DateTime            @default(now())
 
@@ -364,7 +366,7 @@ model MUESTREOS {
     proveedor_id            Int
     huertero                String?
     lote                    String
-    cuidad                  String
+    ciudad                  String
     estado                  String
     ton_aprox               Float?
     bta                     Float

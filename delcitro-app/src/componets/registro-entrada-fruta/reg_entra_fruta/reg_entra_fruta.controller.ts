@@ -30,13 +30,13 @@ export class RegEntraFrutaController {
   }
 
   @Public()
-  @Post('/create')
+  @Post('/crear')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() registro: CreateRegistroDto) {
     return this.service.create(registro);
   }
 
-  @Put(':id')
+  @Put('/editar/:id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
     return this.service.update(id, data);
   }
