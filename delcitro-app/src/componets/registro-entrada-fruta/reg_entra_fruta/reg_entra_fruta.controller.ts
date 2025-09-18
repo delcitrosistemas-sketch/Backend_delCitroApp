@@ -24,7 +24,8 @@ export class RegEntraFrutaController {
     return this.service.findAll();
   }
 
-  @Get(':id')
+  @Public()
+  @Get('/get/:id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.service.findOne(id);
   }

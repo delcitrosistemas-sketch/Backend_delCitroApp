@@ -10,6 +10,7 @@ import { EmpleadosModule } from './componets/empleados/empleados.module';
 import { DocumentosCalidadModule } from './componets/documentos-calidad/documentos-calidad.module';
 import { RegEntraFrutaModule } from './componets/registro-entrada-fruta/reg_entra_fruta/reg_entra_fruta.module';
 import { MuestreosModule } from './componets/muestreos/muestreos.module';
+import { ProveedoresModule } from './componets/proveedores/proveedores.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { MuestreosModule } from './componets/muestreos/muestreos.module';
     DocumentosCalidadModule,
     RegEntraFrutaModule,
     MuestreosModule,
+    ProveedoresModule,
   ],
   exports: [
     UsuariosModule,
@@ -27,6 +29,7 @@ import { MuestreosModule } from './componets/muestreos/muestreos.module';
     DocumentosCalidadModule,
     RegEntraFrutaModule,
     MuestreosModule,
+    ProveedoresModule,
   ],
   controllers: [AppController],
   providers: [

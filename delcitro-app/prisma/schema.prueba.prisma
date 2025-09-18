@@ -195,6 +195,8 @@ model DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
     id                              Int             @id @default(autoincrement())
     bins                            Int?
     jaula                           String?
+    estado                          String?
+    municipio                       String?
     huerta                          String? 
     observaciones                   String?
     muestra_id                      Int?   

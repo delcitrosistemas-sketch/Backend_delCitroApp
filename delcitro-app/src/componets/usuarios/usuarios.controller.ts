@@ -32,6 +32,7 @@ export class UsuariosController {
     return this.userService.create(data);
   }
 
+  @Public()
   @Get('/get-all')
   @HttpCode(HttpStatus.OK)
   async findAll() {
