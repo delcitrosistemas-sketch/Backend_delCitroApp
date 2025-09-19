@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { format } from 'date-fns'; // Cambia esta importación
 import { es } from 'date-fns/locale';
-import { CreateRegistroDto } from 'src/componets/models/RegEntradaFruta.model';
+import { CreateRegistroDto, UpdateRegistroDto } from 'src/componets/models/RegEntradaFruta.model';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -10,12 +10,38 @@ export class RegEntraFrutaService {
 
   async create(data: CreateRegistroDto) {
     return this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.create({
-      data,
+      data: {
+        folio: data.folio,
+        fecha: new Date(data.fecha),
+        boleta: data.boleta,
+        placas_transporte: data.placas_transporte,
+        chofer: data.chofer,
+        variedad: data.variedad,
+        destino: data.destino,
+        inicio_descarga: data.inicio_descarga ? new Date(data.inicio_descarga) : null,
+        fin_descarga: data.fin_descarga ? new Date(data.fin_descarga) : null,
+        cant_progra_desca: data.cant_progra_desca,
+        cant_real_desca: data.cant_real_desca,
+
+        proveedor: {
+          connect: { id: data.proveedor_id },
+        },
+
+        detalles: {
+          create: {
+            bins: data.detalles?.bins ?? null,
+            jaula: data.detalles?.jaula ?? null,
+            estado: data.detalles?.estado ?? null,
+            municipio: data.detalles?.municipio ?? null,
+            huerta: data.detalles?.huerta ?? null,
+            observaciones: data.detalles?.observaciones ?? null,
+            muestra_id: data.detalles?.muestra_id ?? null,
+          },
+        },
+      },
       include: {
         proveedor: true,
-        detalles: {
-          include: { muestreo: true },
-        },
+        detalles: { include: { muestreo: true } },
       },
     });
   }
@@ -68,7 +94,7 @@ export class RegEntraFrutaService {
     };
   }
 
-  async update(id: number, data: CreateRegistroDto) {
+  async update(id: number, data: UpdateRegistroDto) {
     await this.findOne(id);
 
     return this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.update({

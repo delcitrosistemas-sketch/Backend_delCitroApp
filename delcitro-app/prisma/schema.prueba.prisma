@@ -180,12 +180,12 @@ model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
     cant_progra_desca               Float?
     cant_real_desca                 Float?
     proveedor_id                    Int
-    detalles_id                     Int
+    detalles_id                     Int?
     createdAt                       DateTime        @default(now())
     updatedAt                       DateTime        @default(now()) 
 
     proveedor       PROVEEDORES     @relation(fields: [proveedor_id], references: [id])
-    detalles        DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO     @relation(fields: [detalles_id], references: [id])
+    detalles        DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO?     @relation(fields: [detalles_id], references: [id])
 
     @@map("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
 

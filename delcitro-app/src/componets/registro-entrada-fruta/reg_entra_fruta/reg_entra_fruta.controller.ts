@@ -31,7 +31,7 @@ export class RegEntraFrutaController {
   }
 
   @Public()
-  @Post('/crear')
+  @Post('/create')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() registro: CreateRegistroDto) {
     return this.service.create(registro);
