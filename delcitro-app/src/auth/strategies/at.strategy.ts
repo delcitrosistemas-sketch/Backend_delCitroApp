@@ -1,7 +1,7 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 type JwtPayload = {
   sub: number;
@@ -12,12 +12,13 @@ type JwtPayload = {
 export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([(req: Request) => req?.cookies?.access_token]),
+      jwtFromRequest: ExtractJwt.fromExtractors([(req: Request) => req?.cookies?.access_token || null]),
       secretOrKey: 'at-secret',
     });
   }
 
   validate(payload: JwtPayload) {
+    if (!payload) throw new UnauthorizedException('Token inválido');
     return payload;
   }
 }
