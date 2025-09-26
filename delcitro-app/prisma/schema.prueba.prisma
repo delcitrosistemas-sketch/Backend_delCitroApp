@@ -18,9 +18,26 @@ model USUARIOS {
     updatedAt       DateTime       @default(now())
 
     archivosSGC     DOCUMENTOS_SGC[]
+    permisos        USUARIOS_PERMISOS[]
 
     @@map("USUARIOS")
 
+}
+
+model USUARIOS_PERMISOS {
+    id                  Int                 @id @default(autoincrement())
+    usuario_id          Int
+    area_id             Int
+    rol_area            ROLES_AREA
+    activo              Boolean             @default(true)
+    createdAt           DateTime            @default(now())
+    updatedAt           DateTime            @default(now())
+
+    usuario             USUARIOS            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+    area                AREAS               @relation(fields: [area_id], references: [id])
+
+    @@unique([usuario_id, area_id])
+    @@map("USUARIOS_PERMISOS")
 }
 
 model CLIENTES {
@@ -127,15 +144,55 @@ model ROLES {
 model AREAS {
     id              Int             @id @default(autoincrement())
     nombre          String
+    codigo          String?          @unique
+    activo          Boolean?         @default(true)
     createdAt       DateTime        @default(now())
     updatedAt       DateTime        @default(now()) 
 
     empleado        EMPLEADOS[]
     departamentos   DEPARTAMENTOS[]
     chofer          CHOFER[]
+    permisos        USUARIOS_PERMISOS[]
+    modulos         MODULOS_AREA[] 
 
     @@map("AREAS")
 
+}
+
+model MODULOS_AREA {
+    id              Int             @id @default(autoincrement())
+    area_id         Int
+    nombre          String          // Ej: "Muestreos", "Descarga", "Finanzas"
+    codigo          String          // Ej: "muestreos", "descarga", "finanzas"
+    url             String?         // URL del módulo
+    icono           String?         // Nombre del icono
+    orden           Int             @default(0)
+    activo          Boolean         @default(true)
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now())
+
+    area            AREAS           @relation(fields: [area_id], references: [id])
+    permisos        PERMISOS_MODULO[]
+
+    @@unique([area_id, codigo])
+    @@map("MODULOS_AREA")
+}
+
+model PERMISOS_MODULO {
+    id              Int             @id @default(autoincrement())
+    modulo_id       Int
+    rol_area        ROLES_AREA
+    puede_crear     Boolean         @default(false)
+    puede_leer      Boolean         @default(false)
+    puede_actualizar Boolean        @default(false)
+    puede_eliminar  Boolean         @default(false)
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now())
+
+    modulo          MODULOS_AREA    @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+
+    @@unique([modulo_id, rol_area])
+    @@map("PERMISOS_MODULO")
 }
 
 model DEPARTAMENTOS {
@@ -164,6 +221,13 @@ model PUESTOS {
 
     @@map("PUESTOS")
 
+}
+
+enum ROLES_AREA {
+    ADMINISTRADOR_AREA  // Administrador completo del área
+    SUPERVISOR_AREA     // Supervisor con permisos limitados
+    OPERADOR           // Solo consulta y operaciones básicas
+    VISUALIZADOR       // Solo consulta
 }
 
 model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {

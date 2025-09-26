@@ -11,28 +11,34 @@ import {
   UploadedFile,
   UseInterceptors,
   ParseIntPipe,
+  ValidationPipe,
+  UsePipes,
+  UseGuards,
 } from '@nestjs/common';
-
+import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UsuariosService } from './usuarios.service';
-import { GetCurrentUserId } from 'src/common/decorators';
+import { GetCurrentUser, GetCurrentUserId, Public } from 'src/common/decorators';
 import { Prisma } from '@prisma/client';
-import { Public } from '../../common/decorators/public.decorator';
+import { AssignAreaDto } from 'src/auth/dto';
+import { AtGuard } from 'src/common/guards';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('usuarios')
 export class UsuariosController {
-  constructor(private userService: UsuariosService) {}
+  constructor(
+    private userService: UsuariosService,
+    private prisma: PrismaService,
+  ) {}
 
-  @Public()
   @Post('/crear-usuario')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() data: Prisma.USUARIOSCreateInput) {
     return this.userService.create(data);
   }
 
-  @Public()
   @Get('/get-all')
   @HttpCode(HttpStatus.OK)
   async findAll() {
@@ -58,8 +64,11 @@ export class UsuariosController {
   }
 
   @Post('/perfil')
+  @UseGuards(AtGuard)
   @HttpCode(HttpStatus.OK)
-  async infoUser(@GetCurrentUserId() userId: number) {
+  async infoUser(@GetCurrentUserId() userId: number, @GetCurrentUser() currentUser: any) {
+    console.log('=== ENDPOINT PERFIL ===');
+    console.log('Usuario ID desde token:', userId);
     console.log('Entrando info usuario con ID:', userId);
     return this.userService.infoUserProfileById(userId);
   }
@@ -92,5 +101,43 @@ export class UsuariosController {
       message: 'Avatar actualizado correctamente',
       avatarUrl: `${backendUrl}/uploads/avatars/${file.filename}`,
     };
+  }
+
+  @Get('/:id/permissions')
+  async getUserPermissions(@Param('id', ParseIntPipe) userId: number) {
+    return this.userService.getUserPermissions(userId);
+  }
+
+  @Post('/:id/assign-area')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  async assignUserToArea(
+    @Param('id', ParseIntPipe) userId: number,
+    @Body() assignAreaDto: AssignAreaDto,
+  ) {
+    return this.userService.assignUserToArea(userId, assignAreaDto.areaId, assignAreaDto.rolArea);
+  }
+
+  @Delete('/:id/remove-area/:areaId')
+  async removeUserFromArea(
+    @Param('id', ParseIntPipe) userId: number,
+    @Param('areaId', ParseIntPipe) areaId: number,
+  ) {
+    return this.userService.removeUserFromArea(userId, areaId);
+  }
+
+  @Get('/my-permissions')
+  async getMyPermissions(@GetCurrentUserId() userId: number) {
+    return this.userService.getUserPermissions(userId);
+  }
+
+  @Get('/get-areas')
+  async getAreas() {
+    console.log('====');
+    return this.userService.getAreas();
+  }
+
+  @Get('/with-modules')
+  async getAreasWithModules() {
+    return this.userService.getAreasWithModules();
   }
 }

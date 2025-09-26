@@ -99,7 +99,7 @@ export class AuthService {
         },
         {
           secret: 'at-secret',
-          expiresIn: 60 * 5,
+          expiresIn: 60 * 60,
         },
       ),
       this.jwtService.signAsync(
@@ -109,7 +109,7 @@ export class AuthService {
         },
         {
           secret: 'rt-secret',
-          expiresIn: 60 * 60 * 24 * 7,
+          expiresIn: 60 * 60 * 2,
         },
       ),
     ]);
@@ -118,72 +118,5 @@ export class AuthService {
       access_token: at,
       refresh_token: rt,
     };
-  }
-
-  // Auth en cookiees
-  async login(dto: AuthDto, res: Response): Promise<Tokens> {
-    const user = await this.prisma.uSUARIOS.findUnique({
-      where: { usuario: dto.usuario },
-    });
-
-    if (!user) {
-      throw new UnauthorizedException('Usuario no encontrado');
-    }
-
-    const passwordMatches = await bcrypt.compare(dto.password, user.hash);
-    if (!passwordMatches) throw new ForbiddenException('Access Denied');
-
-    const tokens = await this.getTokens2(user.id, user.usuario);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
-
-    // Guardar refresh token en cookie
-    res.cookie('refresh_token', tokens.refresh_token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      path: '/auth/refresh',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días
-    });
-
-    // Devolver access token
-    return tokens;
-  }
-
-  async updateRefreshToken(userId: number, rt: string) {
-    const hash = await bcrypt.hash(rt, 10);
-    await this.prisma.uSUARIOS.update({
-      where: { id: userId },
-      data: { hashedRt: hash }, // asegúrate de que este campo existe en tu modelo
-    });
-  }
-
-  async getTokens2(
-    userId: number,
-    rt: string,
-  ): Promise<{ access_token: string; refresh_token: string }> {
-    const user = await this.prisma.uSUARIOS.findUnique({ where: { id: userId } });
-    if (!user || !user.hashedRt) throw new UnauthorizedException('Access Denied');
-
-    const rtMatches = await bcrypt.compare(rt, user.hashedRt);
-    if (!rtMatches) throw new UnauthorizedException('Access Denied');
-
-    const tokens = await this.getTokens2(user.id, user.usuario);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
-    return tokens;
-  }
-
-  async refreshTokens2(
-    userId: number,
-    rt: string,
-  ): Promise<{ access_token: string; refresh_token: string }> {
-    const user = await this.prisma.uSUARIOS.findUnique({ where: { id: userId } });
-    if (!user || !user.hashedRt) throw new UnauthorizedException('Access Denied');
-
-    const rtMatches = await bcrypt.compare(rt, user.hashedRt);
-    if (!rtMatches) throw new UnauthorizedException('Access Denied');
-
-    const tokens = await this.getTokens2(user.id, user.usuario);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
-    return tokens;
   }
 }
