@@ -11,6 +11,9 @@ import { DocumentosCalidadModule } from './componets/documentos-calidad/document
 import { RegEntraFrutaModule } from './componets/registro-entrada-fruta/reg_entra_fruta/reg_entra_fruta.module';
 import { MuestreosModule } from './componets/muestreos/muestreos.module';
 import { ProveedoresModule } from './componets/proveedores/proveedores.module';
+import { FoliosModule } from './shared/folios/folios.module';
+import { CodigosModule } from './shared/codigos/codigos.module';
+import { LotesModule } from './shared/lotes/lotes.module';
 
 @Module({
   imports: [
@@ -22,6 +25,9 @@ import { ProveedoresModule } from './componets/proveedores/proveedores.module';
     RegEntraFrutaModule,
     MuestreosModule,
     ProveedoresModule,
+    FoliosModule,
+    CodigosModule,
+    LotesModule,
   ],
   exports: [
     UsuariosModule,
@@ -30,6 +36,9 @@ import { ProveedoresModule } from './componets/proveedores/proveedores.module';
     RegEntraFrutaModule,
     MuestreosModule,
     ProveedoresModule,
+    FoliosModule,
+    CodigosModule,
+    LotesModule,
   ],
   controllers: [AppController],
   providers: [

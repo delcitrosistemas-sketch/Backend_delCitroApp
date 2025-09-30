@@ -3,15 +3,20 @@ import { format } from 'date-fns'; // Cambia esta importación
 import { es } from 'date-fns/locale';
 import { CreateRegistroDto, UpdateRegistroDto } from 'src/componets/models/index.model';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { FoliosService } from 'src/shared/folios/folios.service';
 
 @Injectable()
 export class RegEntraFrutaService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private folioService: FoliosService,
+  ) {}
 
   async create(data: CreateRegistroDto) {
+    const folio = await this.folioService.generarFolioRecepcionFruta('Mandarina');
     return this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.create({
       data: {
-        folio: data.folio,
+        folio,
         fecha: new Date(data.fecha),
         boleta: data.boleta,
         placas_transporte: data.placas_transporte,
