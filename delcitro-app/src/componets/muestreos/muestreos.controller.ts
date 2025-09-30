@@ -10,7 +10,7 @@ import {
   Put,
   HttpCode,
 } from '@nestjs/common';
-import { CreateMuestreoDto } from 'src/componets/models/Muestroes.model';
+import { CreateMuestreoDto } from 'src/componets/models/dtos/Muestreo.model';
 import { Public } from 'src/common/decorators';
 import { MuestreosService } from './muestreos.service';
 

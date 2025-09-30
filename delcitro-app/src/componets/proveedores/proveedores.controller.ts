@@ -10,7 +10,6 @@ import {
   ParseIntPipe,
   Patch,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { Public } from '../../common/decorators/public.decorator';
 import { ProveedoresService } from './proveedores.service';
 

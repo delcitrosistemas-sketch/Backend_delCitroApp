@@ -11,7 +11,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { RegEntraFrutaService } from './reg_entra_fruta.service';
-import { CreateRegistroDto } from 'src/componets/models/RegEntradaFruta.model';
+import { CreateRegistroDto } from 'src/componets/models/index.model';
 import { Public } from 'src/common/decorators';
 
 @Controller('reg-entra-fruta')

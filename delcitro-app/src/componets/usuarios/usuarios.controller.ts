@@ -20,7 +20,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UsuariosService } from './usuarios.service';
-import { GetCurrentUser, GetCurrentUserId, Public } from 'src/common/decorators';
+import { GetCurrentUser, GetCurrentUserId } from 'src/common/decorators';
 import { Prisma } from '@prisma/client';
 import { AssignAreaDto } from 'src/auth/dto';
 import { AtGuard } from 'src/common/guards';
@@ -103,7 +103,7 @@ export class UsuariosController {
     };
   }
 
-  @Get('/:id/permissions')
+  @Get('/:id/permisos')
   async getUserPermissions(@Param('id', ParseIntPipe) userId: number) {
     return this.userService.getUserPermissions(userId);
   }

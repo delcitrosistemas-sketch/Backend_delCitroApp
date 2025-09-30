@@ -35,7 +35,6 @@ export class DocumentosCalidadController {
         },
     }),
   }))
-  
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { titulo: string; descripcion?: string; tipo: string; usuario_id?: number },

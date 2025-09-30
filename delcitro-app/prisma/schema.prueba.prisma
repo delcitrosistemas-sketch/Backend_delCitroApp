@@ -455,6 +455,7 @@ model MUESTREOS {
 // Datos que deben estar en las tablas
 
 enum ROLES_GENERALES {
+    SUPER_ADMIN
     USUARIO
     ADMIN
     GERENTE

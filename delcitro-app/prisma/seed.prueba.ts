@@ -1,155 +1,225 @@
 import { PrismaClient } from '@prisma/client';
-import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
-// Definir interfaces para los tipos
-interface Proveedor {
-  id: number;
-  nombre: string | null;
-  empresa: string;
-  direccion: string | null;
-  estado: string;
-  codigoPostal: string | null;
-  pais: string;
-  telefono: string;
-  email: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface DetalleRegistro {
-  id: number;
-  bins: number | null;
-  jaula: string | null;
-  huerta: string | null;
-  observaciones: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 async function main() {
-  console.log('🌱 Iniciando seeding de datos de prueba...');
+  console.log('🌱 Iniciando seed de módulos por área...');
 
-  // Limpiar datos existentes (en el orden correcto por las FK)
-  await prisma.mUESTREOS.deleteMany();
-  await prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.deleteMany();
-  await prisma.dETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO.deleteMany();
-  await prisma.pROVEEDORES.deleteMany();
+  // 1. Primero verificamos que las áreas existan
+  const areas = await prisma.aREAS.findMany();
+  console.log(`📊 Áreas encontradas: ${areas.length}`);
 
-  console.log('🗑️ Datos antiguos eliminados');
-
-  // Crear proveedores con tipo explícito
-  const proveedores: Proveedor[] = [];
-  for (let i = 0; i < 10; i++) {
-    const proveedor = await prisma.pROVEEDORES.create({
-      data: {
-        nombre: faker.person.fullName(),
-        empresa: faker.company.name(),
-        direccion: faker.location.streetAddress(),
-        estado: faker.location.state(),
-        codigoPostal: faker.location.zipCode(),
-        telefono: faker.phone.number(),
-        email: faker.internet.email(),
-      },
-    });
-    proveedores.push(proveedor);
-    console.log(`✅ Proveedor creado: ${proveedor.empresa}`);
+  if (areas.length === 0) {
+    console.log('❌ No hay áreas existentes. Primero debes poblar la tabla AREAS.');
+    return;
   }
 
-  // Crear detalles de registro con tipo explícito
-  const detallesRegistros: DetalleRegistro[] = [];
-  for (let i = 0; i < 15; i++) {
-    const detalle = await prisma.dETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO.create({
-      data: {
-        bins: faker.number.int({ min: 20, max: 50 }),
-        jaula: `JA-${faker.number.int({ min: 1000, max: 9999 })}`,
-        huerta: `Huerta ${faker.location.city()}`,
-        observaciones: faker.lorem.sentence(),
-      },
+  // 2. Definimos los módulos por tipo de área
+
+  const modulosPorArea = [
+    // ÁREAS DE PROCESO
+    /*
+    {
+      areaCodigo: 'produccion',
+      modulos: [
+        { nombre: 'Dashboard Proceso', codigo: 'dashboard-proceso', url: '/proceso/dashboard', icono: 'LayoutDashboard', orden: 1 },
+        { nombre: 'Control de Producción', codigo: 'control-produccion', url: '/proceso/produccion', icono: 'Factory', orden: 2 },
+        { nombre: 'Parámetros de Calidad', codigo: 'parametros-calidad', url: '/proceso/parametros', icono: 'Gauge', orden: 3 },
+        { nombre: 'Reportes de Turno', codigo: 'reportes-turno', url: '/proceso/reportes', icono: 'ClipboardList', orden: 4 },
+      ]
+    },
+    */
+    // DESCARGA
+    {
+      areaCodigo: 'DESCARGA',
+      modulos: [
+        { nombre: 'Registro de Entrada', codigo: 'registro-entrada', url: '/descarga/entrada', icono: 'Truck', orden: 1 },
+        { nombre: 'Control de Calidad', codigo: 'control-calidad', url: '/descarga/calidad', icono: 'CheckCircle', orden: 2 },
+        { nombre: 'Bitácora de Descarga', codigo: 'bitacora-descarga', url: '/descarga/bitacora', icono: 'FileText', orden: 3 },
+      ]
+    },
+
+    // CALIDAD - LABORATORIO
+    {
+      areaCodigo: 'Laboratorio',
+      modulos: [
+        { nombre: 'Análisis de Muestras', codigo: 'analisis-muestras', url: '/calidad/muestras', icono: 'FlaskConical', orden: 1 },
+        { nombre: 'Especificaciones', codigo: 'especificaciones', url: '/calidad/especificaciones', icono: 'FileCheck', orden: 2 },
+        { nombre: 'No Conformidades', codigo: 'no-conformidades', url: '/calidad/noconformidades', icono: 'AlertTriangle', orden: 3 },
+        { nombre: 'Certificados', codigo: 'certificados', url: '/calidad/certificados', icono: 'Award', orden: 4 },
+      ]
+    },
+
+    // ADMINISTRATIVO - FINANZAS
+    {
+      areaCodigo: 'administracion',
+      modulos: [
+        { nombre: 'Dashboard Financiero', codigo: 'dashboard-finanzas', url: '/finanzas/dashboard', icono: 'PieChart', orden: 1 },
+        { nombre: 'Facturación', codigo: 'facturacion', url: '/finanzas/facturacion', icono: 'Receipt', orden: 2 },
+        { nombre: 'Reportes Contables', codigo: 'reportes-contables', url: '/finanzas/contabilidad', icono: 'BarChart', orden: 3 },
+        { nombre: 'Presupuestos', codigo: 'presupuestos', url: '/finanzas/presupuestos', icono: 'Wallet', orden: 4 },
+      ]
+    },
+
+    // RECURSOS HUMANOS
+    {
+      areaCodigo: 'RECURSOS_HUMANOS',
+      modulos: [
+        { nombre: 'Gestión de Empleados', codigo: 'gestion-empleados', url: '/rrhh/empleados', icono: 'Users', orden: 1 },
+        { nombre: 'Nómina', codigo: 'nomina', url: '/rrhh/nomina', icono: 'DollarSign', orden: 2 },
+        { nombre: 'Asistencias', codigo: 'asistencias', url: '/rrhh/asistencias', icono: 'Clock', orden: 3 },
+        { nombre: 'Capacitaciones', codigo: 'capacitaciones', url: '/rrhh/capacitaciones', icono: 'GraduationCap', orden: 4 },
+      ]
+    },
+
+    // ALMACEN
+    {
+      areaCodigo: 'almacen',
+      modulos: [
+        { nombre: 'Inventario', codigo: 'inventario', url: '/almacen/inventario', icono: 'Package', orden: 1 },
+        { nombre: 'Entradas/Salidas', codigo: 'movimientos', url: '/almacen/movimientos', icono: 'ArrowLeftRight', orden: 2 },
+        { nombre: 'Solicitudes', codigo: 'solicitudes', url: '/almacen/solicitudes', icono: 'ClipboardCheck', orden: 3 },
+        { nombre: 'Reportes Stock', codigo: 'reportes-stock', url: '/almacen/reportes', icono: 'TrendingUp', orden: 4 },
+      ]
+    },
+
+    // SISTEMAS DE CALIDAD
+    {
+      areaCodigo: 'SISTEMAS_CALIDAD',
+      modulos: [
+        { nombre: 'Documentación SGC', codigo: 'documentacion-sgc', url: '/calidad/documentos', icono: 'FolderOpen', orden: 1 },
+        { nombre: 'Auditorías', codigo: 'auditorias', url: '/calidad/auditorias', icono: 'SearchCheck', orden: 2 },
+        { nombre: 'Indicadores', codigo: 'indicadores', url: '/calidad/indicadores', icono: 'Target', orden: 3 },
+        { nombre: 'Mejora Continua', codigo: 'mejora-continua', url: '/calidad/mejora', icono: 'TrendingUp', orden: 4 },
+      ]
+    },
+
+    // MANTENIMIENTO
+    {
+      areaCodigo: 'MANTENIMIENTO',
+      modulos: [
+        { nombre: 'Órdenes de Trabajo', codigo: 'ordenes-trabajo', url: '/mantenimiento/ordenes', icono: 'Wrench', orden: 1 },
+        { nombre: 'Preventivo', codigo: 'mantenimiento-preventivo', url: '/mantenimiento/preventivo', icono: 'Calendar', orden: 2 },
+        { nombre: 'Correctivo', codigo: 'mantenimiento-correctivo', url: '/mantenimiento/correctivo', icono: 'AlertCircle', orden: 3 },
+        { nombre: 'Inventario Refacciones', codigo: 'refacciones', url: '/mantenimiento/refacciones', icono: 'Settings', orden: 4 },
+      ]
+    },
+
+    // VENTAS
+    {
+      areaCodigo: 'ventas',
+      modulos: [
+        { nombre: 'Clientes', codigo: 'clientes', url: '/ventas/clientes', icono: 'UserCheck', orden: 1 },
+        { nombre: 'Pedidos', codigo: 'pedidos', url: '/ventas/pedidos', icono: 'ShoppingCart', orden: 2 },
+        { nombre: 'Cotizaciones', codigo: 'cotizaciones', url: '/ventas/cotizaciones', icono: 'FileText', orden: 3 },
+        { nombre: 'Reportes Ventas', codigo: 'reportes-ventas', url: '/ventas/reportes', icono: 'LineChart', orden: 4 },
+      ]
+    },
+
+    // COMPRAS
+    {
+      areaCodigo: 'COMPRAS',
+      modulos: [
+        { nombre: 'Proveedores', codigo: 'proveedores', url: '/compras/proveedores', icono: 'Truck', orden: 1 },
+        { nombre: 'Órdenes Compra', codigo: 'ordenes-compra', url: '/compras/ordenes', icono: 'ShoppingBag', orden: 2 },
+        { nombre: 'Solicitudes', codigo: 'solicitudes-compras', url: '/compras/solicitudes', icono: 'ClipboardList', orden: 3 },
+        { nombre: 'Inventario Proveedores', codigo: 'inventario-proveedores', url: '/compras/inventario', icono: 'Package', orden: 4 },
+      ]
+    }
+  ];
+
+  // 3. Insertar módulos para cada área
+  let modulosCreados = 0;
+
+  for (const grupo of modulosPorArea) {
+    const area = await prisma.aREAS.findFirst({
+      where: { codigo: grupo.areaCodigo }
     });
-    detallesRegistros.push(detalle);
-    console.log(`✅ Detalle de registro creado: ${detalle.jaula}`);
+
+    if (!area) {
+      console.log(`⚠️  Área ${grupo.areaCodigo} no encontrada, saltando...`);
+      continue;
+    }
+
+    console.log(`📦 Creando módulos para área: ${area.nombre}`);
+
+    for (const moduloData of grupo.modulos) {
+      try {
+        await prisma.mODULOS_AREA.upsert({
+          where: {
+            area_id_codigo: {
+              area_id: area.id,
+              codigo: moduloData.codigo
+            }
+          },
+          update: {
+            ...moduloData,
+            activo: true,
+            updatedAt: new Date()
+          },
+          create: {
+            area_id: area.id,
+            ...moduloData,
+            activo: true
+          }
+        });
+        modulosCreados++;
+        console.log(`   ✅ ${moduloData.nombre}`);
+      } catch (error) {
+        console.log(`   ❌ Error creando módulo ${moduloData.nombre}:`, error);
+      }
+    }
   }
 
-  // Crear registros de descarga de fruta
-  const variedades = ['Marrs', 'Temp', 'Valencia', 'Persa', 'Italiano', 'Mandarina', 'Toronja'];
-  const destinos = ['LALA', 'Juge', 'IceGen', 'Conc', 'Emp'];
+  console.log(`🎉 Seed completado. Módulos creados/actualizados: ${modulosCreados}`);
 
-  for (let i = 0; i < 20; i++) {
-    const proveedor = proveedores[Math.floor(Math.random() * proveedores.length)];
-    const detalle = detallesRegistros[Math.floor(Math.random() * detallesRegistros.length)];
-    const fecha = faker.date.recent({ days: 30 });
-
-    const registro = await prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.create({
-      data: {
-        folio: `DESC-2025-${faker.number.int({ min: 1000, max: 9999 })}`,
-        fecha: fecha,
-        boleta: faker.number.int({ min: 10000, max: 99999 }),
-        placas_transporte: `${faker.string.alpha(3).toUpperCase()}${faker.number.int({ min: 1000, max: 9999 })}`,
-        variedad: variedades[Math.floor(Math.random() * variedades.length)],
-        destino: destinos[Math.floor(Math.random() * destinos.length)],
-        inicio_descarga: faker.date.between({ 
-          from: fecha, 
-          to: new Date(fecha.getTime() + 2 * 60 * 60 * 1000) 
-        }),
-        fin_descarga: faker.date.between({ 
-          from: new Date(fecha.getTime() + 3 * 60 * 60 * 1000), 
-          to: new Date(fecha.getTime() + 6 * 60 * 60 * 1000) 
-        }),
-        cant_progra_desca: faker.number.float({ min: 10000, max: 30000, fractionDigits: 2 }),
-        cant_real_desca: faker.number.float({ min: 9500, max: 30500, fractionDigits: 2 }),
-        proveedor_id: proveedor.id,
-        detalles_id: detalle.id,
-      },
-    });
-    console.log(`✅ Registro de descarga creado: ${registro.folio}`);
-  }
-
-  // Crear muestreos
-  const estados = ['Nuevo Leon', 'Sonora', 'Veracruz', 'Tamaulipas', 'San Luis Potosi'];
-  const ciudades = ['Montemorelos', 'Alllende', 'Linares', 'Santiago', 'General Teran'];
-  const sabores = ['1', '2', '3', '4', 'Caracteristico'];
-  const colores = ['34', '35', '36', '37', 'Caracteristico'];
-
-  for (let i = 0; i < 15; i++) {
-    const proveedor = proveedores[Math.floor(Math.random() * proveedores.length)];
-    const fecha = faker.date.recent({ days: 60 });
-
-    const muestreo = await prisma.mUESTREOS.create({
-      data: {
-        fecha: fecha,
-        proveedor_id: proveedor.id,
-        huertero: faker.person.fullName(),
-        lote: `LOTE-${faker.number.int({ min: 100, max: 999 })}`,
-        ciudad: ciudades[Math.floor(Math.random() * ciudades.length)],
-        estado: estados[Math.floor(Math.random() * estados.length)],
-        ton_aprox: faker.number.float({ min: 50, max: 200, fractionDigits: 1 }),
-        bta: faker.number.float({ min: 8.0, max: 12.5, fractionDigits: 2 }),
-        acidez: faker.number.float({ min: 0.8, max: 2.5, fractionDigits: 2 }),
-        rto: faker.number.float({ min: 45, max: 65, fractionDigits: 1 }),
-        rendimiento: faker.number.float({ min: 50, max: 85, fractionDigits: 1 }),
-        sabor: sabores[Math.floor(Math.random() * sabores.length)],
-        color: colores[Math.floor(Math.random() * colores.length)],
-        aceite: faker.number.float({ min: 0.1, max: 0.8, fractionDigits: 3 }),
-        observaciones: faker.lorem.sentence(),
-        analizo: faker.person.fullName(),
-      },
-    });
-    console.log(`✅ Muestreo creado: ${muestreo.lote}`);
-  }
-
-  console.log('🎉 Seeding completado exitosamente!');
-  console.log(`📊 Resumen:`);
-  console.log(`   - ${proveedores.length} proveedores creados`);
-  console.log(`   - ${detallesRegistros.length} detalles de registro creados`);
-  console.log(`   - 20 registros de descarga creados`);
-  console.log(`   - 15 muestreos creados`);
+  // 4. Opcional: Crear permisos básicos para cada módulo
+  await crearPermisosBasicos();
 }
 
+async function crearPermisosBasicos() {
+  console.log('🔐 Creando permisos básicos para módulos...');
+
+  const modulos = await prisma.mODULOS_AREA.findMany({
+    where: { activo: true },
+    include: { permisos: true }
+  });
+
+  let permisosCreados = 0;
+  const rolesArea = ['ADMINISTRADOR_AREA', 'SUPERVISOR_AREA', 'OPERADOR', 'VISUALIZADOR'];
+
+  for (const modulo of modulos) {
+    for (const rol of rolesArea) {
+      // Verificar si ya existe el permiso
+      const permisoExistente = modulo.permisos.find(p => p.rol_area === rol);
+      
+      if (!permisoExistente) {
+        try {
+          await prisma.pERMISOS_MODULO.create({
+            data: {
+              modulo_id: modulo.id,
+              rol_area: rol as any,
+              puede_leer: true, // Todos pueden leer por defecto
+              puede_crear: rol === 'ADMINISTRADOR_AREA' || rol === 'SUPERVISOR_AREA',
+              puede_actualizar: rol === 'ADMINISTRADOR_AREA' || rol === 'SUPERVISOR_AREA',
+              puede_eliminar: rol === 'ADMINISTRADOR_AREA'
+            }
+          });
+          permisosCreados++;
+        } catch (error) {
+          console.log(`   ❌ Error creando permiso para ${modulo.nombre} - ${rol}`);
+        }
+      }
+    }
+  }
+
+  console.log(`🔐 Permisos básicos creados: ${permisosCreados}`);
+}
+
+// Ejecutar el seed
 main()
   .catch((e) => {
-    console.error('❌ Error durante el seeding:', e);
+    console.error('❌ Error durante el seed:', e);
     process.exit(1);
   })
   .finally(async () => {
