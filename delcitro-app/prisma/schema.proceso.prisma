@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client-proceso"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_PROCESO_URL")
+}
+
+enum TipoProceso {
+  Convencional
+  Organico
+}
+
+enum RESPUESTA_FORMULARIOS {
+  C
+  NC
+  NA
+}
+
+// Tabla principal que centraliza todo el proceso
+model REGISTRO_PROCESO {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique
+  fecha                           DateTime         @default(now())
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  variedad                        String
+  destino                         String
+  lote_asignado                   String?
+  
+  // Relaciones con todas las áreas del proceso
+  descarga_fruta                  REGISTRO_DESCARGA_FRUTA?
+  reporte_merma                   REGISTRO_MERMA?
+  verificacion_detergente         REGISTRO_VERIFICACION_DETERGENTE?
+  extractores_finisher            REGISTRO_EXTRACTORES_FINISHER?
+  refrigeracion_pasteurizacion    REGISTRO_REFRIGERACION_PASTEURIZACION?
+  salida_transporte               REGISTRO_SALIDA_TRANSPORTE?
+
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  @@map("REGISTRO_PROCESO")
+}
+
+// Área 1: Descarga de fruta
+model REGISTRO_DESCARGA_FRUTA {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique(map: "descarga_fruta_id_proceso_unique")
+  folio_fruta                     String           @unique(map: "descarga_fruta_folio_unique")
+  fecha                           DateTime         @default(now())
+  placas_transporte               String
+  variedad                        String
+  destino                         String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  inicio_descarga                 DateTime?
+  fin_descarga                    DateTime?
+  cant_progra_desca               Float?
+  cant_real_desca                 Float?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  // Relación con el proceso principal
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
+}
+
+// Área 2: Selección (Reporte de Merma)
+model REGISTRO_MERMA {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique(map: "merma_id_proceso_unique")
+  folio_fruta                     String           @unique(map: "merma_folio_unique")
+  fecha                           DateTime         @default(now())
+  placas_transporte               String
+  variedad                        String
+  destino                         String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  inicio_descarga                 DateTime?
+  fin_descarga                    DateTime?
+  cant_progra_desca               Float?
+  cant_real_desca                 Float?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_REPORTE_MERMA")
+}
+
+// Área 2: Control de lavado de fruta
+model REGISTRO_VERIFICACION_DETERGENTE {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique(map: "verificacion_id_proceso_unique")
+  folio_fruta                     String           @unique(map: "verificacion_folio_unique")
+  fecha                           DateTime         @default(now())
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  hora                            DateTime         @default(now())
+  cant_agua                       Float           // Litros 
+  producto                        String          // nombre del detergente
+  cantidad                        Float           // Litros 
+  concentracion                   Float?          // viene de laboratorio
+  resp_dilucion                   String?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_VERIFICACION_CONCENTRACION_DETERGENTE_LAVADO_FRUTA")
+}
+
+// Área 3: Extractores y Finisher
+model REGISTRO_EXTRACTORES_FINISHER {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique(map: "extractores_id_proceso_unique")
+  folio_fruta                     String           @unique(map: "extractores_folio_unique")
+  fecha                           DateTime         @default(now())
+  producto                        String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  num_extractor                   Int              
+  modelo                          Int
+  medida_extractor                Float
+  hora                            DateTime         @default(now())
+  cap_ext                         Int              
+  presion                         Float
+  ajuste_micro                    String
+  valor_extraccion                String
+  observaciones                   String?
+  hora_finisher_primario          DateTime?
+  psi_finisher_primario           String
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_EXTRACTORES_FINISHER")
+}
+
+// Área 4: Refrigeración y Pasteurización
+model REGISTRO_REFRIGERACION_PASTEURIZACION {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique(map: "refrigeracion_id_proceso_unique")
+  folio_fruta                     String?           @unique(map: "refrigeracion_folio_unique")
+  fecha                           DateTime         @default(now())
+  producto                        String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  secuencia                       Int              
+  tpf                             Int
+  volumen                         Int
+  inicio_envio                    DateTime         @default(now())
+  fin_envio                       DateTime?
+  tiempo_envio                    DateTime?
+  temp_inicio                     Float
+  temp_medio                      Float
+  temp_fin                        Float
+  operador                        String?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_REFRIGERACION_PASTEURIZACION_JUGO")
+}
+
+// Área 6: Carga de producto terminado
+model REGISTRO_SALIDA_TRANSPORTE {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique(map: "salida_id_proceso_unique")
+  fecha_entrada                   DateTime?
+  fecha_salida                    DateTime?
+  fecha_realizo                   DateTime         @default(now())
+  num_placas_unidad               String
+  num_placas_pipa                 String
+  linea_transporte                String
+  firma_chofer                    String
+  nombre_chofer                   String
+  nombre_realizo                  String
+  firma_realizo                   String
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  // Relación con el proceso principal
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+  
+  // Relaciones con las revisiones
+  revision_documentacion          REVISION_DOCUMENTACION[] 
+  revision_transporte             REVISION_TRANSPORTE[] 
+
+  @@map("REGISTRO_SALIDA_TRANSPORTE_PIPA_TERMO")
+}
+
+model REVISION_DOCUMENTACION {
+  id                              Int              @id @default(autoincrement())
+  registro_salida_id              Int
+  boleta_bascula                  RESPUESTA_FORMULARIOS
+  manifiesto_carga                RESPUESTA_FORMULARIOS
+  certificado_analisis            RESPUESTA_FORMULARIOS
+  certificado_lavado              RESPUESTA_FORMULARIOS
+  certificado_inspeccion          RESPUESTA_FORMULARIOS
+  certificado_fumigacion          RESPUESTA_FORMULARIOS
+  certificado_ult_carga           RESPUESTA_FORMULARIOS
+  certificado_orden_carga         RESPUESTA_FORMULARIOS
+  carga_porte                     RESPUESTA_FORMULARIOS
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  registro_salida_pipa            REGISTRO_SALIDA_TRANSPORTE @relation(fields: [registro_salida_id], references: [id], onDelete: Cascade)
+
+  @@map("REVISION_DOCUMENTACION_SALIDA_TRANSPORTE_PIPA_TERMO")
+}
+
+model REVISION_TRANSPORTE {
+  id                              Int              @id @default(autoincrement())
+  registro_salida_id              Int
+  corresponde_placas_num_unidad   RESPUESTA_FORMULARIOS
+  corresponde_placas_num_termo_pipa RESPUESTA_FORMULARIOS
+  sin_perforaciones_caja_tanque   RESPUESTA_FORMULARIOS
+  condicion_paredes               RESPUESTA_FORMULARIOS
+  gatas_correas                   RESPUESTA_FORMULARIOS
+  libre_insectos                  RESPUESTA_FORMULARIOS
+  libre_olores                    RESPUESTA_FORMULARIOS
+  libre_contaminacion             RESPUESTA_FORMULARIOS
+  condicion_piso                  RESPUESTA_FORMULARIOS
+  residuos_carga_ant              RESPUESTA_FORMULARIOS
+  fuga                            RESPUESTA_FORMULARIOS
+  sellos_escotilla_val_puerta     RESPUESTA_FORMULARIOS
+  difusor_termo                   RESPUESTA_FORMULARIOS
+  temp_int_termo                  RESPUESTA_FORMULARIOS
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  registro_salida_pipa            REGISTRO_SALIDA_TRANSPORTE @relation(fields: [registro_salida_id], references: [id], onDelete: Cascade)
+
+  @@map("REVISION_TRANSPORTE_SALIDA_TRANSPORTE_PIPA_TERMO")
+}

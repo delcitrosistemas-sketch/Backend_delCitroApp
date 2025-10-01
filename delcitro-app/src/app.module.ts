@@ -14,10 +14,14 @@ import { ProveedoresModule } from './componets/proveedores/proveedores.module';
 import { FoliosModule } from './shared/folios/folios.module';
 import { CodigosModule } from './shared/codigos/codigos.module';
 import { LotesModule } from './shared/lotes/lotes.module';
+import { BoletasModule } from './shared/boletas/boletas.module';
+import { PrismaProcesoModule } from './prisma/proceso/prisma.proceso.module';
+import { ProcesoModule } from './produccion/proceso/proceso.module';
 
 @Module({
   imports: [
     PrismaModule,
+    PrismaProcesoModule,
     AuthModule,
     UsuariosModule,
     EmpleadosModule,
@@ -28,6 +32,8 @@ import { LotesModule } from './shared/lotes/lotes.module';
     FoliosModule,
     CodigosModule,
     LotesModule,
+    BoletasModule,
+    ProcesoModule,
   ],
   exports: [
     UsuariosModule,
@@ -39,6 +45,8 @@ import { LotesModule } from './shared/lotes/lotes.module';
     FoliosModule,
     CodigosModule,
     LotesModule,
+    BoletasModule,
+    ProcesoModule,
   ],
   controllers: [AppController],
   providers: [

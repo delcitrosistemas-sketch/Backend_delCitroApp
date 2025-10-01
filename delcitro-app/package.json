@@ -26,7 +26,11 @@
     "migrate:test": "prisma migrate dev --schema=./prisma/schema.prueba.prisma",
     "generate:test": "prisma generate --schema=./prisma/schema.prueba.prisma",
     "reset:test": "prisma migrate reset --schema=./prisma/schema.prueba.prisma",
-    "studio:test": "prisma studio --schema=./prisma/schema.prueba.prisma"
+    "studio:test": "prisma studio --schema=./prisma/schema.prueba.prisma",
+    "migrate:test-proceso": "prisma migrate dev --schema=./prisma/schema.proceso.prisma",
+    "generate:test-proceso": "prisma generate --schema=./prisma/schema.proceso.prisma",
+    "reset:test-proceso": "prisma migrate reset --schema=./prisma/schema.proceso.prisma",
+    "studio:test-proceso": "prisma studio --schema=./prisma/schema.proceso.prisma"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",
@@ -34,6 +38,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.0",
+    "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.6",
     "@prisma/client": "^6.15.0",
