@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { te } from 'date-fns/locale';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -14,8 +13,8 @@ export class LotesService {
     const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
       where: {
         fecha: {
-          gte: new Date(now.getFullYear(), now.getMonth(), 1),
-          lt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+          gte: new Date(now.getFullYear(), 0, 1),
+          lt: new Date(now.getFullYear() + 1, 0, 1),
         },
       },
     });
@@ -70,7 +69,6 @@ export class LotesService {
     return `${consecutivo}FCOJ${year}-PR-D`;
   }
 
-  
   async generarLoteProdalimAceiteEsencialNaranja() {
     const now = new Date();
     const year = now.getFullYear().toString().slice(-2);

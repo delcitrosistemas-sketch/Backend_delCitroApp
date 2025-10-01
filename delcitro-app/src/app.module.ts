@@ -14,6 +14,7 @@ import { ProveedoresModule } from './componets/proveedores/proveedores.module';
 import { FoliosModule } from './shared/folios/folios.module';
 import { CodigosModule } from './shared/codigos/codigos.module';
 import { LotesModule } from './shared/lotes/lotes.module';
+import { BoletasModule } from './shared/boletas/boletas.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { LotesModule } from './shared/lotes/lotes.module';
     FoliosModule,
     CodigosModule,
     LotesModule,
+    BoletasModule,
   ],
   exports: [
     UsuariosModule,
@@ -39,6 +41,7 @@ import { LotesModule } from './shared/lotes/lotes.module';
     FoliosModule,
     CodigosModule,
     LotesModule,
+    BoletasModule,
   ],
   controllers: [AppController],
   providers: [

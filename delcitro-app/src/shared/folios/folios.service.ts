@@ -28,11 +28,9 @@ export class FoliosService {
 
     const consecutivo = String(count + 1).padStart(3, '0');
 
-    const frutaInicial = fruta[0].toUpperCase();
-
     const sufijo = organico ? 'O' : '';
 
-    return `${year}${mes}-${consecutivo}${frutaInicial}${sufijo}`;
+    return `${year}${mes}-${consecutivo}${sufijo}`;
   }
 
   // === Código de proceso ===
@@ -43,14 +41,7 @@ export class FoliosService {
     const mesMap = ['EN', 'FB', 'MR', 'AB', 'MY', 'JN', 'JL', 'AG', 'SP', 'OC', 'NV', 'DC'];
     const mes = mesMap[now.getMonth()];
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
-      where: {
-        fecha: {
-          gte: new Date(now.getFullYear(), 0, 1),
-          lt: new Date(now.getFullYear() + 1, 0, 1),
-        },
-      },
-    });
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count();
 
     const consecutivo = String(count + 1).padStart(3, '0');
 
