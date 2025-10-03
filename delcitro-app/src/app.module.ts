@@ -45,8 +45,8 @@ import { ProcesoModule } from './produccion/proceso/proceso.module';
     FoliosModule,
     CodigosModule,
     LotesModule,
-    BoletasModule,
-    ProcesoModule,
+    PrismaModule,
+    PrismaProcesoModule,
   ],
   controllers: [AppController],
   providers: [
