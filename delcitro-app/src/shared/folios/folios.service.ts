@@ -47,7 +47,15 @@ export class FoliosService {
     const mesMap = ['EN', 'FB', 'MR', 'AB', 'MY', 'JN', 'JL', 'AG', 'SP', 'OC', 'NV', 'DC'];
     const mes = mesMap[now.getMonth()];
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count();
+    try {
+      const ultimoRegistro = await this.prismaProceso.rEGISTRO_PROCESO.findFirst({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        select: {
+          id_proceso: true,
+        },
+      });
 
       let consecutivo = 1;
 
