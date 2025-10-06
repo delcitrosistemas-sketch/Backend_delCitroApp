@@ -2,7 +2,7 @@ import { IsString, IsEnum, IsOptional, IsDate } from 'class-validator';
 import { TipoProceso } from '.prisma/client-proceso';
 import { Type } from 'class-transformer';
 
-export class CreateRegistroProcesoDto {
+class CreateRegistroProcesoDto {
   @IsEnum(TipoProceso)
   tipo_proceso: TipoProceso;
 
@@ -22,7 +22,7 @@ export class CreateRegistroProcesoDto {
   fecha?: Date;
 }
 
-export class UpdateRegistroProcesoDto {
+class UpdateRegistroProcesoDto {
   @IsString()
   id_proceso: string;
 
@@ -39,3 +39,5 @@ export class UpdateRegistroProcesoDto {
   @IsOptional()
   lote_asignado?: string;
 }
+
+export { CreateRegistroProcesoDto, UpdateRegistroProcesoDto };

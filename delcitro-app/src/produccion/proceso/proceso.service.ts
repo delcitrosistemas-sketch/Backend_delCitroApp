@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
-import { CreateRegistroProcesoDto, UpdateRegistroProcesoDto } from '../models/dtos/proceso.dto';
+import { CreateRegistroProcesoDto, UpdateRegistroProcesoDto } from '../models/dtos/index.dto';
 
 import { TipoProceso } from '.prisma/client-proceso';
 import { FoliosService } from 'src/shared/folios/folios.service';
@@ -15,20 +15,26 @@ export class ProcesoService {
   async create(data: CreateRegistroProcesoDto) {
     try {
       const folio = await this.folioService.generarCodigoProceso();
-      console.log('Folio en registro proceso: ' + folio);
 
-      // Verificar si el id_proceso ya existe
-      const existing = await this.prisma.rEGISTRO_PROCESO.findUnique({
+      let isOrganic = false;
+      if (data.tipo_proceso === 'Organico') {
+        isOrganic = true;
+      }
+
+      const folioFruta = await this.folioService.generarFolioRecepcionFruta(
+        data.variedad,
+        isOrganic,
+      );
+
+      const existe = await this.prisma.rEGISTRO_PROCESO.findUnique({
         where: { id_proceso: folio },
       });
 
-      if (existing) {
+      if (existe) {
         throw new ConflictException(`El id_proceso ${folio} ya existe`);
       }
 
-      // Usar transacción para crear todos los registros relacionados
       return await this.prisma.$transaction(async (tx) => {
-        // 1. Crear el registro principal
         const registroPrincipal = await tx.rEGISTRO_PROCESO.create({
           data: {
             id_proceso: folio,
@@ -40,108 +46,7 @@ export class ProcesoService {
           },
         });
 
-        // 2. Crear registros vacíos en todas las tablas relacionadas
-        const descargaFruta = await tx.rEGISTRO_DESCARGA_FRUTA.create({
-          data: {
-            id_proceso: folio,
-            folio_fruta: `${folio}-DESCARGA`,
-            fecha: new Date(),
-            placas_transporte: '',
-            variedad: data.variedad,
-            destino: data.destino,
-            tipo_proceso: data.tipo_proceso,
-          },
-        });
-
-        const reporteMerma = await tx.rEGISTRO_MERMA.create({
-          data: {
-            id_proceso: folio,
-            folio_fruta: `${folio}-MERMA`,
-            fecha: new Date(),
-            placas_transporte: '',
-            variedad: data.variedad,
-            destino: data.destino,
-            tipo_proceso: data.tipo_proceso,
-          },
-        });
-
-        const verificacionDetergente = await tx.rEGISTRO_VERIFICACION_DETERGENTE.create({
-          data: {
-            id_proceso: folio,
-            folio_fruta: `${folio}-DETERGENTE`,
-            fecha: new Date(),
-            tipo_proceso: data.tipo_proceso,
-            hora: new Date(),
-            cant_agua: 0,
-            producto: '',
-            cantidad: 0,
-            concentracion: 0,
-            resp_dilucion: '',
-          },
-        });
-
-        const extractoresFinisher = await tx.rEGISTRO_EXTRACTORES_FINISHER.create({
-          data: {
-            id_proceso: folio,
-            folio_fruta: `${folio}-EXTRACTORES`,
-            fecha: new Date(),
-            producto: '',
-            tipo_proceso: data.tipo_proceso,
-            num_extractor: 0,
-            modelo: 0,
-            medida_extractor: 0,
-            hora: new Date(),
-            cap_ext: 0,
-            presion: 0,
-            ajuste_micro: '',
-            valor_extraccion: '',
-            observaciones: '',
-            psi_finisher_primario: '',
-          },
-        });
-
-        const refrigeracionPasteurizacion = await tx.rEGISTRO_REFRIGERACION_PASTEURIZACION.create({
-          data: {
-            id_proceso: folio,
-            folio_fruta: '',
-            fecha: new Date(),
-            producto: '',
-            tipo_proceso: data.tipo_proceso,
-            secuencia: 0,
-            tpf: 0,
-            volumen: 0,
-            inicio_envio: new Date(),
-            temp_inicio: 0,
-            temp_medio: 0,
-            temp_fin: 0,
-            operador: '',
-          },
-        });
-
-        const salidaTransporte = await tx.rEGISTRO_SALIDA_TRANSPORTE.create({
-          data: {
-            id_proceso: folio,
-            fecha_realizo: new Date(),
-            num_placas_unidad: '',
-            num_placas_pipa: '',
-            linea_transporte: '',
-            firma_chofer: '',
-            nombre_chofer: '',
-            nombre_realizo: '',
-            firma_realizo: '',
-          },
-        });
-
-        // Retornar el registro principal con todas las relaciones creadas
-        return {
-          ...registroPrincipal,
-          descarga_fruta: descargaFruta,
-          reporte_merma: reporteMerma,
-          verificacion_detergente: verificacionDetergente,
-          extractores_finisher: extractoresFinisher,
-          refrigeracion_pasteurizacion: refrigeracionPasteurizacion,
-          salida_transporte: salidaTransporte,
-        };
+        return registroPrincipal;
       });
     } catch (error) {
       if (error instanceof ConflictException) {

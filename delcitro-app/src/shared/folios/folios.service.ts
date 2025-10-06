@@ -10,10 +10,7 @@ export class FoliosService {
   ) {}
 
   // === Recepción de fruta ===
-  async generarFolioRecepcionFruta(
-    fruta: 'Naranja' | 'Toronja' | 'Limon' | 'Mandarina',
-    organico = false,
-  ) {
+  async generarFolioRecepcionFruta(fruta: string, organico = false) {
     const now = new Date();
 
     const year = now.getFullYear().toString().slice(-2);
@@ -31,11 +28,12 @@ export class FoliosService {
     });
 
     const consecutivo = String(count + 1).padStart(3, '0');
-
-    const letraFruta = fruta.charAt(0);
+    let letraFruta = '';
+    if (fruta === 'Naranja' || fruta === 'Toronja' || fruta === 'Limon' || fruta === 'Mandarina') {
+      letraFruta = fruta.charAt(0);
+    }
     const sufijo = organico ? 'O' : '';
 
-    return `${year}${mes}-${consecutivo}${sufijo}`;
     return `${year}${mes}-${consecutivo}${letraFruta}${sufijo}`;
   }
 

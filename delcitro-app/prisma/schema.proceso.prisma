@@ -30,23 +30,23 @@ model REGISTRO_PROCESO {
   lote_asignado                   String?
   
   // Relaciones con todas las áreas del proceso
-  descarga_fruta                  REGISTRO_DESCARGA_FRUTA?
-  reporte_merma                   REGISTRO_MERMA?
-  verificacion_detergente         REGISTRO_VERIFICACION_DETERGENTE?
-  extractores_finisher            REGISTRO_EXTRACTORES_FINISHER?
-  refrigeracion_pasteurizacion    REGISTRO_REFRIGERACION_PASTEURIZACION?
-  salida_transporte               REGISTRO_SALIDA_TRANSPORTE?
+  descarga_fruta                  REGISTRO_DESCARGA_FRUTA[]
+  reporte_merma                   REGISTRO_MERMA[]
+  verificacion_detergente         REGISTRO_VERIFICACION_DETERGENTE[]
+  extractores_finisher            REGISTRO_EXTRACTORES_FINISHER[]
+  refrigeracion_pasteurizacion    REGISTRO_REFRIGERACION_PASTEURIZACION[]
+  salida_transporte               REGISTRO_SALIDA_TRANSPORTE[]
 
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
 
-  @@map("REGISTRO_PROCESO")
+  @@map("REGISTRO_PROCESO")   
 }
 
 // Área 1: Descarga de fruta
 model REGISTRO_DESCARGA_FRUTA {
   id                              Int              @id @default(autoincrement())
-  id_proceso                      String           @unique(map: "descarga_fruta_id_proceso_unique")
+  id_proceso                      String
   folio_fruta                     String           @unique(map: "descarga_fruta_folio_unique")
   fecha                           DateTime         @default(now())
   placas_transporte               String
@@ -69,17 +69,20 @@ model REGISTRO_DESCARGA_FRUTA {
 // Área 2: Selección (Reporte de Merma)
 model REGISTRO_MERMA {
   id                              Int              @id @default(autoincrement())
-  id_proceso                      String           @unique(map: "merma_id_proceso_unique")
+  id_proceso                      String
   folio_fruta                     String           @unique(map: "merma_folio_unique")
   fecha                           DateTime         @default(now())
-  placas_transporte               String
-  variedad                        String
-  destino                         String
   tipo_proceso                    TipoProceso      @default(Convencional)
-  inicio_descarga                 DateTime?
+  variedad                        String
+  num_orden                       Int
+  area                            String
+  hora_pesado                     DateTime?
   fin_descarga                    DateTime?
   cant_progra_desca               Float?
-  cant_real_desca                 Float?
+  peso_bruto                      Float
+  peso_tara                       Float
+  peso_neto                       Float
+  observaciones                   String?
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
 
@@ -91,7 +94,7 @@ model REGISTRO_MERMA {
 // Área 2: Control de lavado de fruta
 model REGISTRO_VERIFICACION_DETERGENTE {
   id                              Int              @id @default(autoincrement())
-  id_proceso                      String           @unique(map: "verificacion_id_proceso_unique")
+  id_proceso                      String
   folio_fruta                     String           @unique(map: "verificacion_folio_unique")
   fecha                           DateTime         @default(now())
   tipo_proceso                    TipoProceso      @default(Convencional)
@@ -112,7 +115,7 @@ model REGISTRO_VERIFICACION_DETERGENTE {
 // Área 3: Extractores y Finisher
 model REGISTRO_EXTRACTORES_FINISHER {
   id                              Int              @id @default(autoincrement())
-  id_proceso                      String           @unique(map: "extractores_id_proceso_unique")
+  id_proceso                      String
   folio_fruta                     String           @unique(map: "extractores_folio_unique")
   fecha                           DateTime         @default(now())
   producto                        String
@@ -139,7 +142,7 @@ model REGISTRO_EXTRACTORES_FINISHER {
 // Área 4: Refrigeración y Pasteurización
 model REGISTRO_REFRIGERACION_PASTEURIZACION {
   id                              Int              @id @default(autoincrement())
-  id_proceso                      String           @unique(map: "refrigeracion_id_proceso_unique")
+  id_proceso                      String
   folio_fruta                     String?           @unique(map: "refrigeracion_folio_unique")
   fecha                           DateTime         @default(now())
   producto                        String
@@ -165,7 +168,7 @@ model REGISTRO_REFRIGERACION_PASTEURIZACION {
 // Área 6: Carga de producto terminado
 model REGISTRO_SALIDA_TRANSPORTE {
   id                              Int              @id @default(autoincrement())
-  id_proceso                      String           @unique(map: "salida_id_proceso_unique")
+  id_proceso                      String
   fecha_entrada                   DateTime?
   fecha_salida                    DateTime?
   fecha_realizo                   DateTime         @default(now())
