@@ -79,5 +79,4 @@ export class LavadoController {
   removeByIdProceso(@Param('id_proceso') id_proceso: string) {
     return this.lavadoService.removeByIdProceso(id_proceso);
   }
-
 }

@@ -24,7 +24,7 @@ export class DescargaController {
   @Post('/crear')
   @HttpCode(HttpStatus.CREATED)
   create(@Body() data: CreateDescargaFrutaDto) {
-    console.log(JSON.stringify(data))
+    console.log(JSON.stringify(data));
     return this.descargaFrutaService.create(data);
   }
 
@@ -35,7 +35,7 @@ export class DescargaController {
 
   @Get('/:id_proceso')
   findByIdProceso(@Param('id_proceso') id_proceso: string) {
-    return this.descargaFrutaService.findByIdProceso(id_proceso);
+    return this.descargaFrutaService.findAllByIdProceso(id_proceso);
   }
 
   @Get('/calcular-tiempo-descarga/:id_proceso')
