@@ -19,6 +19,13 @@ enum RESPUESTA_FORMULARIOS {
   NA
 }
 
+enum Status_Proceso {
+  En_Proceso
+  Completado
+  Pendiente
+  Rechazado
+}
+
 // Tabla principal que centraliza todo el proceso
 model REGISTRO_PROCESO {
   id                              Int              @id @default(autoincrement())
@@ -28,6 +35,7 @@ model REGISTRO_PROCESO {
   variedad                        String
   destino                         String
   lote_asignado                   String?
+  status                          Status_Proceso?
   
   // Relaciones con todas las áreas del proceso
   descarga_fruta                  REGISTRO_DESCARGA_FRUTA[]

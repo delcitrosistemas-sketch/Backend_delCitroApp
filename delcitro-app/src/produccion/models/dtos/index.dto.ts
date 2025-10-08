@@ -3,3 +3,5 @@ export * from './proceso.dto';
 export * from './seleccion.dto';
 export * from './lavado-fruta.dto';
 export * from './extracctores-finisher.dto';
+export * from './refrigeracion.dto';
+export * from './salida-transporte.dto';

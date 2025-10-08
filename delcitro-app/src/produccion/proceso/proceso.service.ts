@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
 import { CreateRegistroProcesoDto, UpdateRegistroProcesoDto } from '../models/dtos/index.dto';
 
-import { TipoProceso } from '.prisma/client-proceso';
+import { TipoProceso, $Enums } from '.prisma/client-proceso';
 import { FoliosService } from 'src/shared/folios/folios.service';
 
 @Injectable()
@@ -42,6 +42,7 @@ export class ProcesoService {
             variedad: data.variedad,
             destino: data.destino,
             lote_asignado: data.lote_asignado,
+            status: 'En_Proceso',
             fecha: new Date(),
           },
         });
@@ -139,6 +140,56 @@ export class ProcesoService {
         throw error;
       }
       throw new Error(`Error al obtener el registro de proceso: ${error.message}`);
+    }
+  }
+
+  async findByStatus(data: string) {
+    try {
+      const statusEnum = data as $Enums.Status_Proceso;
+
+      const registros = await this.prisma.rEGISTRO_PROCESO.findMany({
+        where: { status: statusEnum },
+      });
+
+      if (!registros) {
+        throw new NotFoundException(`Registro de proceso con id_proceso ${data} no encontrado`);
+      }
+
+      const registrosFormateados = registros.map((registro) => ({
+        ...registro,
+        fecha: this.formatDate(registro.fecha),
+        createdAt: this.formatDate(registro.createdAt),
+        updatedAt: this.formatDate(registro.updatedAt),
+      }));
+
+      return registrosFormateados;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Error al obtener el registro de proceso: ${error.message}`);
+    }
+  }
+
+  async getFoliosEnProceso() {
+    try {
+      const registros = await this.prisma.rEGISTRO_PROCESO.findMany({
+        where: { status: 'En_Proceso' },
+        select: {
+          id_proceso: true,
+        },
+        orderBy: {
+          fecha: 'desc',
+        },
+      });
+
+      if (registros.length === 0) {
+        return [];
+      }
+
+      return registros;
+    } catch (error) {
+      throw new Error(`Error al obtener los registros de proceso: ${error.message}`);
     }
   }
 
@@ -262,5 +313,51 @@ export class ProcesoService {
     } catch (error) {
       throw new Error(`Error al obtener registros por rango de fecha: ${error.message}`);
     }
+  }
+
+  async contarProcesos() {
+    try {
+      const [total, enProceso, completados, pendientes, rechazados] = await Promise.all([
+        this.prisma.rEGISTRO_PROCESO.count(),
+        this.prisma.rEGISTRO_PROCESO.count({
+          where: { status: 'En_Proceso' },
+        }),
+        this.prisma.rEGISTRO_PROCESO.count({
+          where: { status: 'Completado' },
+        }),
+        this.prisma.rEGISTRO_PROCESO.count({
+          where: { status: 'Pendiente' },
+        }),
+        this.prisma.rEGISTRO_PROCESO.count({
+          where: { status: 'Rechazado' },
+        }),
+      ]);
+
+      return {
+        total,
+        enProceso,
+        completados,
+        pendientes,
+        rechazados,
+      };
+    } catch (error) {
+      throw new Error(`Error al contar procesos: ${error.message}`);
+    }
+  }
+
+  private formatDate(date: Date | string): string {
+    if (!date) return '';
+
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+    if (isNaN(dateObj.getTime())) {
+      return '';
+    }
+
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const year = dateObj.getFullYear();
+
+    return `${day}/${month}/${year}`;
   }
 }

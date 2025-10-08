@@ -19,12 +19,12 @@ import {
 export class ExtraccionController {
   constructor(private extraccionService: ExtraccionService) {}
 
-  @Post()
+  @Post('/crear')
   create(@Body() data: CreateExtractoresFinisherDto) {
     return this.extraccionService.create(data);
   }
 
-  @Get()
+  @Get('/obtenerTodos')
   findAll() {
     return this.extraccionService.findAll();
   }
@@ -54,7 +54,7 @@ export class ExtraccionController {
     return this.extraccionService.findByFechaRange(new Date(fechaInicio), new Date(fechaFin));
   }
 
-  @Get('/:producto')
+  @Get('/producto/:producto')
   findByProducto(@Param('producto') producto: string) {
     return this.extraccionService.findByProducto(producto);
   }

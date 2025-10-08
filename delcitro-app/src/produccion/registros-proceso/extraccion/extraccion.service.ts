@@ -24,14 +24,6 @@ export class ExtraccionService {
         throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
       }
 
-      const folioExiste = await this.prisma.rEGISTRO_EXTRACTORES_FINISHER.findUnique({
-        where: { folio_fruta: data.folio_fruta },
-      });
-
-      if (folioExiste) {
-        throw new ConflictException(`El folio_fruta ${data.folio_fruta} ya existe`);
-      }
-
       return await this.prisma.rEGISTRO_EXTRACTORES_FINISHER.create({
         data: {
           ...data,

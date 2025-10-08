@@ -30,6 +30,7 @@ import { RefrigeracionService } from '../registros-proceso/refrigeracion/refrige
 import { HomogenizacionService } from '../registros-proceso/homogenizacion/homogenizacion.service';
 import { CargaProductoTerminadoService } from '../registros-proceso/carga-producto-terminado/carga-producto-terminado.service';
 import { LavadoService } from '../registros-proceso/lavado/lavado.service';
+import { EstadisticasProcesoService } from './proceso.estadisticas.service';
 
 @Module({
   controllers: [
@@ -44,6 +45,7 @@ import { LavadoService } from '../registros-proceso/lavado/lavado.service';
   ],
   providers: [
     ProcesoService,
+    EstadisticasProcesoService,
     FoliosService,
     DescargaService,
     SeleccionService,
