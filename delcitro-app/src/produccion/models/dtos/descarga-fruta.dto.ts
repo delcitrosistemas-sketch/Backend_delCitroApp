@@ -88,6 +88,10 @@ class UpdateDescargaFrutaDto {
   @IsOptional()
   @IsNumber()
   cant_real_desca?: number;
+
+  @IsOptional()
+  @IsNumber()
+  num_orden?: number;
 }
 
 export { CreateDescargaFrutaDto, UpdateDescargaFrutaDto };

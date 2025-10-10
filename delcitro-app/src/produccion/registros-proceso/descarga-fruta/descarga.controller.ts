@@ -28,14 +28,15 @@ export class DescargaController {
     return this.descargaFrutaService.create(data);
   }
 
+  @Get('/:id_proceso')
+  findByIdProceso(@Param('id_proceso') id_proceso: string) {
+    console.log('Buscando descarga para proceso:', id_proceso);
+    return this.descargaFrutaService.findByIdProceso(id_proceso);
+  }
+
   @Get('/obtenerTodos')
   findAll() {
     return this.descargaFrutaService.findAll();
-  }
-
-  @Get('/:id_proceso')
-  findByIdProceso(@Param('id_proceso') id_proceso: string) {
-    return this.descargaFrutaService.findAllByIdProceso(id_proceso);
   }
 
   @Get('/calcular-tiempo-descarga/:id_proceso')

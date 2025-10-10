@@ -23,11 +23,18 @@ export class DescargaService {
       if (!procesoExiste) {
         throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
       }
+      const countRegistros = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
+        where: { id_proceso: data.id_proceso },
+      });
+
+      // El num_orden será el conteo actual + 1
+      const num_orden = countRegistros + 1;
 
       return await this.prisma.rEGISTRO_DESCARGA_FRUTA.create({
         data: {
           ...data,
           fecha: data.fecha || new Date(),
+          num_orden: num_orden,
         },
       });
     } catch (error) {
@@ -77,7 +84,7 @@ export class DescargaService {
 
   async findByIdProceso(id_proceso: string) {
     try {
-      const procesoExists = await this.prisma.rEGISTRO_PROCESO.findUnique({
+      const procesoExists = await this.prisma.rEGISTRO_PROCESO.findFirst({
         where: { id_proceso },
       });
 

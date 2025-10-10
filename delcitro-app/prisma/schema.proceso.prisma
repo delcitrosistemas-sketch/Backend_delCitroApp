@@ -53,9 +53,9 @@ model REGISTRO_PROCESO {
 
 // Área 1: Descarga de fruta
 model REGISTRO_DESCARGA_FRUTA {
-  id                              Int              @id @default(autoincrement())
+  id                               Int              @id @default(autoincrement())
   id_proceso                      String
-  folio_fruta                     String           @unique(map: "descarga_fruta_folio_unique")
+  folio_fruta                     String           
   fecha                           DateTime         @default(now())
   placas_transporte               String
   variedad                        String
@@ -65,6 +65,8 @@ model REGISTRO_DESCARGA_FRUTA {
   fin_descarga                    DateTime?
   cant_progra_desca               Float?
   cant_real_desca                 Float?
+  num_orden                       Int?
+  observaciones                   String?
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
 
