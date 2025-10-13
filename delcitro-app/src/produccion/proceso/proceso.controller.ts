@@ -108,6 +108,10 @@ export class ProcesoController {
   getEstadisticasAnuales() {
     return this.estadisticasService.getEstadisticasAnuales();
   }
+  @Get('/estadisticas/anual-mes')
+  getEstadisticasAnualesPorMes() {
+    return this.estadisticasService.getEstadisticasMensualAnual();
+  }
 
   @Get('/estadisticas/tipo-proceso')
   getEstadisticasPorTipo() {

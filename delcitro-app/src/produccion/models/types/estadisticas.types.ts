@@ -4,6 +4,15 @@ export interface EstadisticaMensual {
   nombre: string;
   cantidad: number;
 }
+export interface EstadisticaMensualAnual {
+  año: number;
+  mes: number;
+  nombre: string;
+  nombreCorto: string;
+  cantidad: number;
+  fechaCompleta: Date;
+  periodo: string;
+}
 
 export interface EstadisticaAnual {
   año: number;
@@ -36,6 +45,7 @@ export interface EstadisticasCompletas {
   mensual: EstadisticaMensual[];
   diario: EstadisticaDiaria[];
   anual: EstadisticaAnual[];
+  mensualAnual: EstadisticaMensualAnual[];
   porTipo: EstadisticaPorTipo[];
   porVariedad: EstadisticaPorVariedad[];
   porStatus: EstadisticaPorStatus[];

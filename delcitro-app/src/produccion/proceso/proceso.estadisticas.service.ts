@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
 import { FoliosService } from 'src/shared/folios/folios.service';
-import { EstadisticaAnual, EstadisticaMensual } from '../models/types/estadisticas.types';
+import {
+  EstadisticaAnual,
+  EstadisticaMensual,
+  EstadisticaMensualAnual,
+} from '../models/types/estadisticas.types';
 
 @Injectable()
 export class EstadisticasProcesoService {
@@ -16,6 +20,7 @@ export class EstadisticasProcesoService {
         estadisticasMensuales,
         estadisticasDiarias,
         estadisticasAnuales,
+        estadisticasAnualesMensuales,
         estadisticasPorTipo,
         estadisticasPorVariedad,
         estadisticasPorStatus,
@@ -24,6 +29,7 @@ export class EstadisticasProcesoService {
         this.getEstadisticasMensuales(),
         this.getEstadisticasDiarias(),
         this.getEstadisticasAnuales(),
+        this.getEstadisticasMensualAnual(),
         this.getEstadisticasPorTipoProceso(),
         this.getEstadisticasPorVariedad(),
         this.getEstadisticasPorStatus(),
@@ -34,6 +40,7 @@ export class EstadisticasProcesoService {
         mensual: estadisticasMensuales,
         diario: estadisticasDiarias,
         anual: estadisticasAnuales,
+        mensualAnual: estadisticasAnualesMensuales,
         porTipo: estadisticasPorTipo,
         porVariedad: estadisticasPorVariedad,
         porStatus: estadisticasPorStatus,
@@ -87,7 +94,7 @@ export class EstadisticasProcesoService {
     });
 
     // Ahora TypeScript conoce el tipo
-    return Object.values(meses).sort((a: EstadisticaMensual, b: EstadisticaMensual) => 
+    return Object.values(meses).sort((a: EstadisticaMensual, b: EstadisticaMensual) =>
       a.mes.localeCompare(b.mes),
     );
   }
@@ -121,6 +128,82 @@ export class EstadisticasProcesoService {
     }));
   }
 
+  // Estadísticas mensuales (últimos 60 meses - 5 años)
+  async getEstadisticasMensualAnual(): Promise<EstadisticaMensualAnual[]> {
+    const fechaFin = new Date();
+    const fechaInicio = new Date();
+    fechaInicio.setMonth(fechaInicio.getMonth() - 59); // Últimos 60 meses
+
+    const resultados = await this.prisma.rEGISTRO_PROCESO.groupBy({
+      by: ['fecha'],
+      _count: {
+        id: true,
+      },
+      where: {
+        fecha: {
+          gte: fechaInicio,
+          lte: fechaFin,
+        },
+      },
+      orderBy: {
+        fecha: 'asc',
+      },
+    });
+
+    // Crear un mapa para agrupar por año y mes
+    const mesesMap: { [key: string]: EstadisticaMensualAnual } = {};
+
+    // Inicializar todos los meses de los últimos 5 años con 0
+    const currentYear = fechaFin.getFullYear();
+    const currentMonth = fechaFin.getMonth() + 1;
+
+    for (let i = 59; i >= 0; i--) {
+      const tempDate = new Date();
+      tempDate.setMonth(tempDate.getMonth() - i);
+      const año = tempDate.getFullYear();
+      const mes = tempDate.getMonth() + 1;
+      const clave = `${año}-${mes.toString().padStart(2, '0')}`;
+
+      const fechaMes = new Date(año, mes - 1, 1);
+      const nombreMes = fechaMes.toLocaleDateString('es-ES', {
+        month: 'short',
+        year: 'numeric',
+      });
+      const nombreCorto = fechaMes.toLocaleDateString('es-ES', {
+        month: 'short',
+      });
+
+      mesesMap[clave] = {
+        año: año,
+        mes: mes,
+        nombre: nombreMes,
+        nombreCorto: nombreCorto,
+        cantidad: 0,
+        fechaCompleta: fechaMes,
+        periodo: clave,
+      };
+    }
+
+    // Llenar con datos reales
+    resultados.forEach((item) => {
+      const fecha = new Date(item.fecha);
+      const año = fecha.getFullYear();
+      const mes = fecha.getMonth() + 1;
+      const clave = `${año}-${mes.toString().padStart(2, '0')}`;
+
+      if (mesesMap[clave]) {
+        mesesMap[clave].cantidad += item._count.id;
+      }
+    });
+
+    // Convertir a array y ordenar cronológicamente
+    const mesesArray = Object.values(mesesMap).sort((a, b) => {
+      if (a.año !== b.año) return a.año - b.año;
+      return a.mes - b.mes;
+    });
+
+    return mesesArray;
+  }
   // Estadísticas anuales (últimos 5 años)
   async getEstadisticasAnuales(): Promise<EstadisticaAnual[]> {
     const fechaFin = new Date();
@@ -156,6 +239,7 @@ export class EstadisticasProcesoService {
 
     return Object.values(años).sort((a: EstadisticaAnual, b: EstadisticaAnual) => a.año - b.año);
   }
+
   // Estadísticas por tipo de proceso
   async getEstadisticasPorTipoProceso() {
     const resultados = await this.prisma.rEGISTRO_PROCESO.groupBy({
@@ -174,6 +258,12 @@ export class EstadisticasProcesoService {
 
   // 5. Estadísticas por variedad (top 10)
   async getEstadisticasPorVariedad() {
+    // Obtener el mes y año actual
+    const ahora = new Date();
+    const añoActual = ahora.getFullYear();
+    const mesActual = ahora.getMonth() + 1; // Los meses van de 0-11, así que sumamos 1
+
+    // Obtener estadísticas generales
     const resultados = await this.prisma.rEGISTRO_PROCESO.groupBy({
       by: ['variedad'],
       _count: {
@@ -187,10 +277,68 @@ export class EstadisticasProcesoService {
       take: 10,
     });
 
-    return resultados.map((item) => ({
-      variedad: item.variedad,
-      cantidad: item._count.id,
-    }));
+    // Obtener estadísticas del mes actual
+    const resultadosMesActual = await this.prisma.rEGISTRO_PROCESO.groupBy({
+      by: ['variedad'],
+      _count: {
+        id: true,
+      },
+      where: {
+        fecha: {
+          gte: new Date(añoActual, mesActual - 1, 1), // Primer día del mes
+          lt: new Date(añoActual, mesActual, 1), // Primer día del siguiente mes
+        },
+      },
+    });
+
+    // Calcular total general y total del mes actual
+    const totalGeneral = resultados.reduce((sum, item) => sum + item._count.id, 0);
+    const totalMesActual = resultadosMesActual.reduce((sum, item) => sum + item._count.id, 0);
+
+    return resultados.map((item) => {
+      // Encontrar la cantidad para esta variedad en el mes actual
+      const variedadMesActual = resultadosMesActual.find(v => v.variedad === item.variedad);
+      const cantidadMesActual = variedadMesActual?._count.id || 0;
+
+      // Calcular porcentajes
+      const porcentajeGeneral = totalGeneral > 0 ? (item._count.id / totalGeneral) * 100 : 0;
+      const porcentajeMesActual =
+        totalMesActual > 0 ? (cantidadMesActual / totalMesActual) * 100 : 0;
+
+      return {
+        variedad: item.variedad,
+        cantidad: item._count.id,
+        cantidadMesActual: cantidadMesActual,
+        porcentaje: Math.round(porcentajeGeneral * 100) / 100, // Redondear a 2 decimales
+        porcentajeMesActual: Math.round(porcentajeMesActual * 100) / 100,
+        mesActual: `${mesActual}/${añoActual}`,
+        tendencia: this.calcularTendenciaVariedad(
+          item._count.id,
+          cantidadMesActual,
+          totalGeneral,
+          totalMesActual,
+        ),
+      };
+    });
+  }
+
+  // Método auxiliar para calcular la tendencia
+  private calcularTendenciaVariedad(
+    cantidadTotal: number,
+    cantidadMesActual: number,
+    totalGeneral: number,
+    totalMesActual: number,
+  ): string {
+    if (totalGeneral === 0 || totalMesActual === 0) return 'estable';
+
+    const porcentajeHistorico = (cantidadTotal / totalGeneral) * 100;
+    const porcentajeActual = (cantidadMesActual / totalMesActual) * 100;
+
+    const diferencia = porcentajeActual - porcentajeHistorico;
+
+    if (diferencia > 5) return 'ascendente';
+    if (diferencia < -5) return 'descendente';
+    return 'estable';
   }
 
   // Estadísticas por status
