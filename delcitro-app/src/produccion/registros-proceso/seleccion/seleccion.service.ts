@@ -20,19 +20,18 @@ export class SeleccionService {
       if (!procesoExiste) {
         throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
       }
-
-      const existeFolio = await this.prisma.rEGISTRO_MERMA.findUnique({
-        where: { folio_fruta: data.folio_fruta },
+      const countRegistros = await this.prisma.rEGISTRO_MERMA.count({
+        where: { id_proceso: data.id_proceso },
       });
 
-      if (existeFolio) {
-        throw new ConflictException(`El folio_fruta ${data.folio_fruta} ya existe`);
-      }
+      const num_orden = countRegistros + 1;
 
       return await this.prisma.rEGISTRO_MERMA.create({
         data: {
           ...data,
+          area: 'Seleccion',
           fecha: data.fecha || new Date(),
+          num_orden: num_orden,
         },
       });
     } catch (error) {

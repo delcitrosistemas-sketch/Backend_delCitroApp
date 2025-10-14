@@ -6,8 +6,6 @@ class CreateReporteMermaDto {
   @IsString()
   id_proceso: string;
 
-  @IsString()
-  folio_fruta: string;
 
   @IsOptional()
   @Type(() => Date)
@@ -24,7 +22,8 @@ class CreateReporteMermaDto {
   num_orden: number;
 
   @IsString()
-  area: string;
+  @IsOptional()
+  area?: string;
 
   @IsOptional()
   @Type(() => Date)

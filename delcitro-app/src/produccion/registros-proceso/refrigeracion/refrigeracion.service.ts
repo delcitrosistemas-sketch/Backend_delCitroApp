@@ -90,7 +90,7 @@ export class RefrigeracionService {
 
   async findByFolioFruta(folio_fruta: string) {
     try {
-      const registro = await this.prisma.rEGISTRO_REFRIGERACION_PASTEURIZACION.findUnique({
+      const registro = await this.prisma.rEGISTRO_REFRIGERACION_PASTEURIZACION.findFirst({
         where: { folio_fruta },
         include: {
           proceso: true,

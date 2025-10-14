@@ -78,7 +78,7 @@ export class ExtraccionService {
 
   async findByFolioFruta(folio_fruta: string) {
     try {
-      const registro = await this.prisma.rEGISTRO_EXTRACTORES_FINISHER.findUnique({
+      const registro = await this.prisma.rEGISTRO_EXTRACTORES_FINISHER.findFirst({
         where: { folio_fruta },
         include: {
           proceso: true,

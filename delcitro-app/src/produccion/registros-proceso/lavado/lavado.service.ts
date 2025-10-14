@@ -24,11 +24,19 @@ export class LavadoService {
         throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
       }
 
+      const countRegistros = await this.prisma.rEGISTRO_VERIFICACION_DETERGENTE.count({
+        where: { id_proceso: data.id_proceso },
+      });
+
+      // El num_orden será el conteo actual + 1
+      const num_orden = countRegistros + 1;
+
       return await this.prisma.rEGISTRO_VERIFICACION_DETERGENTE.create({
         data: {
           ...data,
           fecha: data.fecha || new Date(),
           hora: data.hora || new Date(),
+          num_orden: num_orden,
         },
       });
     } catch (error) {

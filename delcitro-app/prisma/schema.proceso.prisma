@@ -80,7 +80,6 @@ model REGISTRO_DESCARGA_FRUTA {
 model REGISTRO_MERMA {
   id                              Int              @id @default(autoincrement())
   id_proceso                      String
-  folio_fruta                     String           @unique(map: "merma_folio_unique")
   fecha                           DateTime         @default(now())
   tipo_proceso                    TipoProceso      @default(Convencional)
   variedad                        String
@@ -93,6 +92,7 @@ model REGISTRO_MERMA {
   peso_tara                       Float
   peso_neto                       Float
   observaciones                   String?
+  turno                           Int?
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
 
@@ -105,7 +105,7 @@ model REGISTRO_MERMA {
 model REGISTRO_VERIFICACION_DETERGENTE {
   id                              Int              @id @default(autoincrement())
   id_proceso                      String
-  folio_fruta                     String           @unique(map: "verificacion_folio_unique")
+  folio_fruta                     String
   fecha                           DateTime         @default(now())
   tipo_proceso                    TipoProceso      @default(Convencional)
   hora                            DateTime         @default(now())
@@ -114,6 +114,7 @@ model REGISTRO_VERIFICACION_DETERGENTE {
   cantidad                        Float           // Litros 
   concentracion                   Float?          // viene de laboratorio
   resp_dilucion                   String?
+  num_orden                       Int?
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
 
@@ -126,7 +127,7 @@ model REGISTRO_VERIFICACION_DETERGENTE {
 model REGISTRO_EXTRACTORES_FINISHER {
   id                              Int              @id @default(autoincrement())
   id_proceso                      String
-  folio_fruta                     String           @unique(map: "extractores_folio_unique")
+  folio_fruta                     String
   fecha                           DateTime         @default(now())
   producto                        String
   tipo_proceso                    TipoProceso      @default(Convencional)
@@ -153,7 +154,7 @@ model REGISTRO_EXTRACTORES_FINISHER {
 model REGISTRO_REFRIGERACION_PASTEURIZACION {
   id                              Int              @id @default(autoincrement())
   id_proceso                      String
-  folio_fruta                     String?           @unique(map: "refrigeracion_folio_unique")
+  folio_fruta                     String?
   fecha                           DateTime         @default(now())
   producto                        String
   tipo_proceso                    TipoProceso      @default(Convencional)
