@@ -7,6 +7,7 @@ import {
 import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
 import {
   CreateRefrigeracionPasteurizacionDto,
+  CreateRefrigeracionPasteurizacionSingleDto,
   UpdateRefrigeracionPasteurizacionDto,
 } from 'src/produccion/models/dtos/index.dto';
 import { TipoProceso } from '.prisma/client-proceso';
@@ -15,7 +16,7 @@ import { TipoProceso } from '.prisma/client-proceso';
 export class RefrigeracionService {
   constructor(private prisma: PrismaProcesoService) {}
 
-  async create(data: CreateRefrigeracionPasteurizacionDto) {
+  async create(data: CreateRefrigeracionPasteurizacionSingleDto) {
     try {
       const procesoExiste = await this.prisma.rEGISTRO_PROCESO.findUnique({
         where: { id_proceso: data.id_proceso },
@@ -41,6 +42,45 @@ export class RefrigeracionService {
       }
       throw new Error(
         `Error al crear el registro de refrigeración/pasteurización: ${error.message}`,
+      );
+    }
+  }
+
+  async createMultiple(data: CreateRefrigeracionPasteurizacionDto) {
+    try {
+      const procesoExiste = await this.prisma.rEGISTRO_PROCESO.findUnique({
+        where: { id_proceso: data.id_proceso },
+      });
+
+      if (!procesoExiste) {
+        throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
+      }
+
+      // Crear múltiples registros
+      const createPromises = data.secuencias.map((secuencia) => {
+        const createData: any = {
+          id_proceso: data.id_proceso,
+          folio_fruta: data.folio_fruta,
+          producto: data.producto,
+          tipo_proceso: data.tipo_proceso || TipoProceso.Convencional,
+          operador: data.operador,
+          fecha: data.fecha || new Date(),
+          ...secuencia,
+        };
+
+        return this.prisma.rEGISTRO_REFRIGERACION_PASTEURIZACION.create({
+          data: createData,
+        });
+      });
+
+      const results = await this.prisma.$transaction(createPromises);
+      return results;
+    } catch (error) {
+      if (error instanceof NotFoundException || error instanceof ConflictException) {
+        throw error;
+      }
+      throw new Error(
+        `Error al crear los registros de refrigeración/pasteurización: ${error.message}`,
       );
     }
   }

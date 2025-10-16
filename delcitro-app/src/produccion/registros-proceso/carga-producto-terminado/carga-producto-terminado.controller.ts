@@ -23,8 +23,6 @@ import {
 export class CargaProductoTerminadoController {
   constructor(private regProdTerminadoService: CargaProductoTerminadoService) {}
 
-  // ========== ENDPOINTS REGISTRO SALIDA TRANSPORTE ==========
-
   @Post('/crear/registro-salida')
   createRegistroSalida(@Body() data: CreateRegistroSalidaTransporteDto) {
     return this.regProdTerminadoService.createRegistroSalida(data);

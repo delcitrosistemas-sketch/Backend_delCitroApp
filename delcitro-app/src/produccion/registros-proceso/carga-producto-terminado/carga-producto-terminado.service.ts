@@ -27,14 +27,31 @@ export class CargaProductoTerminadoService {
         where: { id_proceso: data.id_proceso },
       });
 
+      console.log(JSON.stringify(data.id_proceso));
+
       if (!procesoExiste) {
         throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
       }
 
       return await this.prisma.rEGISTRO_SALIDA_TRANSPORTE.create({
         data: {
-          ...data,
+          id_proceso: data.id_proceso,
+          fecha_entrada: data.fecha_entrada,
+          fecha_salida: data.fecha_salida,
           fecha_realizo: data.fecha_realizo || new Date(),
+          num_placas_unidad: data.num_placas_unidad,
+          num_placas_pipa: data.num_placas_pipa,
+          linea_transporte: data.linea_transporte,
+          firma_chofer: data.firma_chofer,
+          nombre_chofer: data.nombre_chofer,
+          nombre_realizo: data.nombre_realizo,
+          firma_realizo: data.firma_realizo,
+          revision_documentacion: {
+            create: data.revision_documentacion,
+          },
+          revision_transporte: {
+            create: data.revision_transporte,
+          },
         },
         include: {
           proceso: true,
@@ -129,19 +146,74 @@ export class CargaProductoTerminadoService {
 
   async updateRegistroSalida(id: number, data: UpdateRegistroSalidaTransporteDto) {
     try {
-      await this.findRegistroSalidaById(id);
+      const registroExistente = await this.findRegistroSalidaById(id);
 
-      return await this.prisma.rEGISTRO_SALIDA_TRANSPORTE.update({
-        where: { id },
-        data: {
-          ...data,
-          updatedAt: new Date(),
-        },
-        include: {
-          proceso: true,
-          revision_documentacion: true,
-          revision_transporte: true,
-        },
+      const baseData: any = {
+        ...data,
+        updatedAt: new Date(),
+      };
+
+      const { revision_documentacion, revision_transporte, ...updateData } = baseData;
+
+      // Usar transacción para actualizar el registro principal y las relaciones
+      return await this.prisma.$transaction(async (tx) => {
+        // 1. Actualizar el registro principal
+        const registroActualizado = await tx.rEGISTRO_SALIDA_TRANSPORTE.update({
+          where: { id },
+          data: updateData,
+        });
+
+        if (revision_documentacion) {
+          const revisionDocExistente = await tx.rEVISION_DOCUMENTACION.findFirst({
+            where: { registro_salida_id: id },
+          });
+
+          if (revisionDocExistente) {
+            await tx.rEVISION_DOCUMENTACION.update({
+              where: { id: revisionDocExistente.id },
+              data: revision_documentacion,
+            });
+          } else {
+            // Crear nueva revisión
+            await tx.rEVISION_DOCUMENTACION.create({
+              data: {
+                registro_salida_id: id,
+                ...revision_documentacion,
+              },
+            });
+          }
+        }
+
+        if (revision_transporte) {
+          const revisionTransExistente = await tx.rEVISION_TRANSPORTE.findFirst({
+            where: { registro_salida_id: id },
+          });
+
+          if (revisionTransExistente) {
+            await tx.rEVISION_TRANSPORTE.update({
+              where: { id: revisionTransExistente.id },
+              data: revision_transporte,
+            });
+          } else {
+            // Crear nueva revisión
+            await tx.rEVISION_TRANSPORTE.create({
+              data: {
+                registro_salida_id: id,
+                ...revision_transporte,
+              },
+            });
+          }
+        }
+
+        // 4. Retornar el registro completo con las relaciones actualizadas
+        return await tx.rEGISTRO_SALIDA_TRANSPORTE.findUnique({
+          where: { id },
+          include: {
+            proceso: true,
+            revision_documentacion: true,
+            revision_transporte: true,
+          },
+        });
       });
     } catch (error) {
       if (error instanceof NotFoundException) {

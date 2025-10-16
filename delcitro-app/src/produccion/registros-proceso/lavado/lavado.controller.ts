@@ -20,7 +20,7 @@ import {
 export class LavadoController {
   constructor(private lavadoService: LavadoService) {}
 
-  @Post('/create')
+  @Post('/crear')
   @HttpCode(HttpStatus.CREATED)
   create(@Body() data: CreateVerificacionDetergenteDto) {
     return this.lavadoService.create(data);

@@ -20,8 +20,13 @@ export class RefrigeracionController {
   constructor(private refrigeracionService: RefrigeracionService) {}
 
   @Post('/crear')
-  create(@Body() createRefrigeracionPasteurizacionDto: CreateRefrigeracionPasteurizacionDto) {
-    return this.refrigeracionService.create(createRefrigeracionPasteurizacionDto);
+  create(@Body() data: any) {
+    return this.refrigeracionService.create(data);
+  }
+
+  @Post('/multiple')
+  async createMultiple(@Body() data: CreateRefrigeracionPasteurizacionDto) {
+    return this.refrigeracionService.createMultiple(data);
   }
 
   @Get('/obtenerTodos')
