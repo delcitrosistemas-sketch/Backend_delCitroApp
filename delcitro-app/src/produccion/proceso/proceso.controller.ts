@@ -64,7 +64,7 @@ export class ProcesoController {
     return this.registroProcesoService.findByFechaRange(new Date(fechaInicio), new Date(fechaFin));
   }
 
-  @Get('/id-proceso/:id_proceso')
+  @Get('/id_proceso/:id_proceso')
   findByIdProceso(@Param('id_proceso') id_proceso: string) {
     return this.registroProcesoService.findByIdProceso(id_proceso);
   }
@@ -74,7 +74,7 @@ export class ProcesoController {
     return this.registroProcesoService.findOne(id);
   }
 
-  @Patch('/id-proceso/:id_proceso')
+  @Patch('/editar/:id_proceso')
   updateByIdProceso(
     @Param('id_proceso') id_proceso: string,
     @Body() data: UpdateRegistroProcesoDto,
@@ -82,7 +82,7 @@ export class ProcesoController {
     return this.registroProcesoService.updateByIdProceso(id_proceso, data);
   }
 
-  @Delete('/id-proceso/:id_proceso')
+  @Delete('/id_proceso/:id_proceso')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeByIdProceso(@Param('id_proceso') id_proceso: string) {
     return this.registroProcesoService.removeByIdProceso(id_proceso);

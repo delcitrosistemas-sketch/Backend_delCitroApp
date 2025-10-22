@@ -37,6 +37,8 @@ model USUARIOS_PERMISOS {
     usuario             USUARIOS            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
     area                AREAS               @relation(fields: [area_id], references: [id])
 
+    permisos_modulo     PERMISOS_MODULO[]
+
     @@unique([usuario_id, area_id])
     @@map("USUARIOS_PERMISOS")
 }
@@ -181,6 +183,7 @@ model MODULOS_AREA {
 
 model PERMISOS_MODULO {
     id              Int             @id @default(autoincrement())
+    usuario_permiso_id  Int?
     modulo_id       Int
     rol_area        ROLES_AREA
     puede_crear     Boolean         @default(false)
@@ -191,8 +194,9 @@ model PERMISOS_MODULO {
     updatedAt       DateTime        @default(now())
 
     modulo          MODULOS_AREA    @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+    usuario_permiso USUARIOS_PERMISOS? @relation(fields: [usuario_permiso_id], references: [id], onDelete: Cascade)
 
-    @@unique([modulo_id, rol_area])
+    @@unique([modulo_id, rol_area, usuario_permiso_id])
     @@map("PERMISOS_MODULO")
 }
 

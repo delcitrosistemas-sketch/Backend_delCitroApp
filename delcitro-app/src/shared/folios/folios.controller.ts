@@ -40,11 +40,7 @@ export class FoliosController {
       const folio = await this.folioService.generarCodigoProceso();
 
       return {
-        success: true,
         folio,
-        detalles: {
-          timestamp: new Date().toISOString(),
-        },
       };
     } catch (error) {
       return {

@@ -77,8 +77,13 @@ export class UsuariosService {
 
     return {
       ...user,
-      avatar: user.avatar ? `${backendUrl}/uploads/avatars/${user.avatar}` : null,
+      avatar: user.avatar ? `${user.avatar}` : null,
     };
+    /*
+       return {
+      ...user,
+      avatar: user.avatar ? `${backendUrl}/uploads/avatars/${user.avatar}` : null,
+    };*/
   }
 
   async updateAvatar(userId: number, filename: string) {

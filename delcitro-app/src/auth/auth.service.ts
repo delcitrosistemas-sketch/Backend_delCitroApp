@@ -24,7 +24,7 @@ export class AuthService {
       },
     });
 
-    const tokens = await this.getTokens(newUser.id, newUser.usuario);
+    const tokens = await this.getTokens(newUser.id, newUser.usuario, newUser.rol);
     await this.updateRtHash(newUser.id, tokens.refresh_token);
 
     return tokens;
@@ -35,6 +35,21 @@ export class AuthService {
       where: {
         usuario: dto.usuario,
       },
+      include: {
+        permisos: {
+          where: {
+            activo: true,
+          },
+          include: {
+            area: true,
+            permisos_modulo: {
+              include: {
+                modulo: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!user) throw new ForbiddenException('Access Denied');
@@ -42,9 +57,36 @@ export class AuthService {
     const passwordMatches = await bcrypt.compare(dto.password, user.hash);
     if (!passwordMatches) throw new ForbiddenException('Access Denied');
 
-    const tokens = await this.getTokens(user.id, user.usuario);
+    // Obtener permisos del usuario
+    const userPermissions = await this.getUserPermissions(user);
+
+    const tokens = await this.getTokens(user.id, user.usuario, userPermissions);
     await this.updateRtHash(user.id, tokens.refresh_token);
     return tokens;
+  }
+
+   async getUserPermissions(user: any) {
+    const permissions = {
+      globalRole: user.rol,
+      areas: user.permisos.map((permiso: any) => ({
+        areaId: permiso.area_id,
+        areaCodigo: permiso.area.codigo,
+        areaNombre: permiso.area.nombre,
+        rolArea: permiso.rol_area,
+        modulos: permiso.permisos_modulo.map((pm: any) => ({
+          codigo: pm.modulo.codigo,
+          nombre: pm.modulo.nombre,
+          permisos: {
+            leer: pm.puede_leer,
+            crear: pm.puede_crear,
+            actualizar: pm.puede_actualizar,
+            eliminar: pm.puede_eliminar,
+          },
+        })),
+      })),
+    };
+
+    return permissions;
   }
 
   async logout(user: number) {
@@ -90,12 +132,13 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
-  async getTokens(userId: number, usuario: string) {
+  async getTokens(userId: number, usuario: string, userPermissions: any) {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           usuario,
+          permissions: userPermissions,
         },
         {
           secret: 'at-secret',

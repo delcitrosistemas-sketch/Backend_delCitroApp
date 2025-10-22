@@ -57,7 +57,7 @@ export class UsuariosController {
     return this.userService.update(id, data);
   }
 
-  @Delete(':id')
+  @Delete('/eliminar/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);
