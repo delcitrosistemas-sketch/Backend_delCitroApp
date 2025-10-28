@@ -23,7 +23,20 @@ export class UsuariosService {
   }
 
   async findAll() {
-    return this.prisma.uSUARIOS.findMany();
+    return this.prisma.uSUARIOS.findMany({
+      include: {
+        permisos: {
+          include: {
+            area: true,
+            permisos_modulo: {
+              include: {
+                modulo: true,
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   async findOne(id: number) {
@@ -251,6 +264,128 @@ export class UsuariosService {
         },
       },
       orderBy: { nombre: 'asc' },
+    });
+  }
+
+  async updateUsuario(id: number, updateData: any) {
+    const { usuario, rol, avatar, permisos } = updateData;
+
+    // Iniciar transacción para actualizar usuario y permisos
+    return await this.prisma.$transaction(async (prisma) => {
+      // 1. Actualizar datos básicos del usuario
+      const updatedUser = await prisma.uSUARIOS.update({
+        where: { id },
+        data: {
+          ...(usuario && { usuario }),
+          ...(rol && { rol }),
+          ...(avatar && { avatar }),
+          updatedAt: new Date(),
+        },
+      });
+
+      if (permisos && Array.isArray(permisos)) {
+        await this.updateUserPermissions(prisma, id, permisos);
+      }
+
+      return await prisma.uSUARIOS.findUnique({
+        where: { id },
+        include: {
+          permisos: {
+            include: {
+              area: true,
+              permisos_modulo: {
+                include: {
+                  modulo: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    });
+  }
+
+  private async updateUserPermissions(prisma: any, userId: number, permisos: any[]) {
+    await prisma.uSUARIOS_PERMISOS.deleteMany({
+      where: { usuario_id: userId },
+    });
+
+    for (const permiso of permisos) {
+      const { area_id, rol_area, activo, permisos_modulo } = permiso;
+
+      const userPermiso = await prisma.uSUARIOS_PERMISOS.create({
+        data: {
+          usuario_id: userId,
+          area_id,
+          rol_area,
+          activo: activo !== undefined ? activo : true,
+        },
+      });
+
+      if (permisos_modulo && Array.isArray(permisos_modulo)) {
+        for (const moduloPerm of permisos_modulo) {
+          await prisma.pERMISOS_MODULO.create({
+            data: {
+              usuario_permiso_id: userPermiso.id,
+              modulo_id: moduloPerm.modulo_id,
+              rol_area: rol_area,
+              puede_leer: moduloPerm.puede_leer || false,
+              puede_crear: moduloPerm.puede_crear || false,
+              puede_actualizar: moduloPerm.puede_actualizar || false,
+              puede_eliminar: moduloPerm.puede_eliminar || false,
+            },
+          });
+        }
+      }
+    }
+  }
+
+  async getModulos() {
+    return this.prisma.mODULOS_AREA.findMany({
+      where: { activo: true },
+      select: {
+        id: true,
+        nombre: true,
+        codigo: true,
+        url: true,
+        icono: true,
+        orden: true,
+        area: {
+          select: {
+            id: true,
+            nombre: true,
+            codigo: true,
+          },
+        },
+      },
+      orderBy: [
+        {
+          area: {
+            nombre: 'asc',
+          },
+        },
+        {
+          orden: 'asc',
+        },
+      ],
+    });
+  }
+
+  async getUserWithPermissions(userId: number) {
+    return this.prisma.uSUARIOS.findUnique({
+      where: { id: userId },
+      include: {
+        permisos: {
+          include: {
+            area: true,
+            permisos_modulo: {
+              include: {
+                modulo: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 }

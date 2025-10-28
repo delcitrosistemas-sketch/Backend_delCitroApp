@@ -41,5 +41,7 @@ async function bootstrap() {
   console.log('🍪 CORS configurado para cookies httpOnly');
   //app.useGlobalGuards(app.get(AtGuard));
   await app.listen(3001, '0.0.0.0');
+  console.log('🚀 Servidor ejecutándose en puerto 3001');
+
 }
 bootstrap();

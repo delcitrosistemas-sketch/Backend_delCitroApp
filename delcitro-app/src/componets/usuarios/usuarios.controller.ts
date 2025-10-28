@@ -44,11 +44,34 @@ export class UsuariosController {
   async findAll() {
     return this.userService.findAll();
   }
+  @Get('/get-areas')
+  @HttpCode(HttpStatus.OK)
+  async getAreas() {
+    return this.userService.getAreas();
+  }
+
+  @Get('/get-modulos')
+  @HttpCode(HttpStatus.OK)
+  async getModulos() {
+    return this.userService.getModulos();
+  }
+
+  @Get('/my-permissions')
+  @HttpCode(HttpStatus.OK)
+  async getMyPermissions(@GetCurrentUserId() userId: number) {
+    return this.userService.getUserPermissions(userId);
+  }
 
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findOne(id);
+  }
+
+  @Get('/with-modules')
+  @HttpCode(HttpStatus.OK)
+  async getAreasWithModules() {
+    return this.userService.getAreasWithModules();
   }
 
   @Put(':id')
@@ -67,9 +90,6 @@ export class UsuariosController {
   @UseGuards(AtGuard)
   @HttpCode(HttpStatus.OK)
   async infoUser(@GetCurrentUserId() userId: number, @GetCurrentUser() currentUser: any) {
-    console.log('=== ENDPOINT PERFIL ===');
-    console.log('Usuario ID desde token:', userId);
-    console.log('Entrando info usuario con ID:', userId);
     return this.userService.infoUserProfileById(userId);
   }
 
@@ -125,19 +145,8 @@ export class UsuariosController {
     return this.userService.removeUserFromArea(userId, areaId);
   }
 
-  @Get('/my-permissions')
-  async getMyPermissions(@GetCurrentUserId() userId: number) {
-    return this.userService.getUserPermissions(userId);
-  }
-
-  @Get('/get-areas')
-  async getAreas() {
-    console.log('====');
-    return this.userService.getAreas();
-  }
-
-  @Get('/with-modules')
-  async getAreasWithModules() {
-    return this.userService.getAreasWithModules();
+  @Put('/actualizar/:id')
+  async actualizarUsuario(@Param('id') id: string, @Body() updateData: any) {
+    return this.userService.updateUsuario(parseInt(id), updateData);
   }
 }

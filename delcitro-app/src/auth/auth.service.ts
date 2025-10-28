@@ -31,6 +31,8 @@ export class AuthService {
   }
 
   async signinLocal(dto: AuthDto): Promise<Tokens> {
+    console.log('1. Iniciando signinLocal para:', dto.usuario);
+
     const user = await this.prisma.uSUARIOS.findUnique({
       where: {
         usuario: dto.usuario,
