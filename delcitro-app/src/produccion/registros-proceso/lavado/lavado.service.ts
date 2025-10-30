@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import {
   CreateVerificacionDetergenteDto,
   UpdateVerificacionDetergenteDto,
@@ -12,7 +12,7 @@ import {
 
 @Injectable()
 export class LavadoService {
-  constructor(private prisma: PrismaProcesoService) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(data: CreateVerificacionDetergenteDto) {
     try {

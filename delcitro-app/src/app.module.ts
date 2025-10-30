@@ -15,7 +15,6 @@ import { FoliosModule } from './shared/folios/folios.module';
 import { CodigosModule } from './shared/codigos/codigos.module';
 import { LotesModule } from './shared/lotes/lotes.module';
 import { BoletasModule } from './shared/boletas/boletas.module';
-import { PrismaProcesoModule } from './prisma/proceso/prisma.proceso.module';
 import { ProcesoModule } from './produccion/proceso/proceso.module';
 import { ConfigModule } from '@nestjs/config';
 
@@ -26,7 +25,6 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: '.env',
     }),
     PrismaModule,
-    PrismaProcesoModule,
     AuthModule,
     UsuariosModule,
     EmpleadosModule,
@@ -51,7 +49,6 @@ import { ConfigModule } from '@nestjs/config';
     CodigosModule,
     LotesModule,
     PrismaModule,
-    PrismaProcesoModule,
   ],
   controllers: [AppController],
   providers: [

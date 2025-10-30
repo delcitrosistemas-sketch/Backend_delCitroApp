@@ -1,13 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
 
 @Injectable()
 export class FoliosService {
-  constructor(
-    private prisma: PrismaService,
-    private prismaProceso: PrismaProcesoService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   // === Recepción de fruta ===
   async generarFolioRecepcionFruta(fruta: string, organico = false) {
@@ -18,7 +14,7 @@ export class FoliosService {
     const mesMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
     const mes = mesMap[now.getMonth()];
 
-    const count = await this.prismaProceso.rEGISTRO_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_PROCESO.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), now.getMonth(), 1),
@@ -46,7 +42,7 @@ export class FoliosService {
     const mes = mesMap[now.getMonth()];
 
     try {
-      const ultimoRegistro = await this.prismaProceso.rEGISTRO_PROCESO.findFirst({
+      const ultimoRegistro = await this.prisma.rEGISTRO_PROCESO.findFirst({
         orderBy: {
           createdAt: 'desc',
         },
@@ -70,7 +66,7 @@ export class FoliosService {
 
       return `PR${consecutivoFormateado}${mes}${year}`;
     } catch (error) {
-      throw new Error(`Error al generar código de proceso: ${error.message}`);
+      throw new Error(`Error al generar código de proceso: ${error}`);
     }
   }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { FoliosService } from 'src/shared/folios/folios.service';
 import {
   EstadisticaAnual,
@@ -10,7 +10,7 @@ import {
 @Injectable()
 export class EstadisticasProcesoService {
   constructor(
-    private prisma: PrismaProcesoService,
+    private prisma: PrismaService,
     private folioService: FoliosService,
   ) {}
 

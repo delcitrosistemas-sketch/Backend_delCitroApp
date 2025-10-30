@@ -9,7 +9,6 @@ import { ExtraccionModule } from '../registros-proceso/extraccion/extraccion.mod
 import { HomogenizacionModule } from '../registros-proceso/homogenizacion/homogenizacion.module';
 import { RefrigeracionModule } from '../registros-proceso/refrigeracion/refrigeracion.module';
 import { SeleccionModule } from '../registros-proceso/seleccion/seleccion.module';
-import { PrismaProcesoModule } from 'src/prisma/proceso/prisma.proceso.module';
 import { LavadoModule } from '../registros-proceso/lavado/lavado.module';
 
 // Controllers
@@ -56,7 +55,6 @@ import { EstadisticasProcesoService } from './proceso.estadisticas.service';
     LavadoService,
   ],
   imports: [
-    PrismaProcesoModule,
     CargaProductoTerminadoModule,
     DescargaModule,
     ExtraccionModule,
