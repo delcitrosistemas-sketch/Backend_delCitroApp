@@ -10,7 +10,7 @@ import {
   CreateRefrigeracionPasteurizacionSingleDto,
   UpdateRefrigeracionPasteurizacionDto,
 } from 'src/produccion/models/dtos/index.dto';
-import { TipoProceso } from '.prisma/client-proceso';
+import { TipoProceso } from '.prisma/client';
 
 @Injectable()
 export class RefrigeracionService {

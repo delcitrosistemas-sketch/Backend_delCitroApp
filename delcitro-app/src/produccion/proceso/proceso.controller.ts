@@ -12,7 +12,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ProcesoService } from './proceso.service';
-import { TipoProceso } from '.prisma/client-proceso';
+import { TipoProceso } from '.prisma/client';
 import { CreateRegistroProcesoDto, UpdateRegistroProcesoDto } from '../models/dtos/proceso.dto';
 import { EstadisticasProcesoService } from './proceso.estadisticas.service';
 

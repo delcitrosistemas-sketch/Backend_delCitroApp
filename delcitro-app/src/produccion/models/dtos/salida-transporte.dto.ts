@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsDate, IsEnum, IsInt, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { RESPUESTA_FORMULARIOS } from '.prisma/client-proceso';
+import { RESPUESTA_FORMULARIOS } from '.prisma/client';
 
 export enum RespuestaFormularios {
   SI = 'SI',

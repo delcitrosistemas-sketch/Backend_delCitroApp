@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsDate, IsEnum, IsInt } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TipoProceso } from '.prisma/client-proceso';
+import { TipoProceso } from '.prisma/client';
 
 class CreateExtractoresFinisherDto {
   @IsString()

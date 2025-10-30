@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsOptional, IsDate } from 'class-validator';
-import { TipoProceso } from '.prisma/client-proceso';
+import { TipoProceso } from '.prisma/client';
 import { Type } from 'class-transformer';
 
 class CreateRegistroProcesoDto {

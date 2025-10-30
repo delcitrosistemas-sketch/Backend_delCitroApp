@@ -1,6 +1,6 @@
 import { IsString, IsEnum, IsOptional, IsDate, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
-import { TipoProceso } from '.prisma/client-proceso';
+import { TipoProceso } from '.prisma/client';
 
 class CreateDescargaFrutaDto {
   @IsString()

@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
-import { RESPUESTA_FORMULARIOS } from '.prisma/client-proceso';
+import { RESPUESTA_FORMULARIOS } from '.prisma/client';
 import {
   CreateRegistroSalidaTransporteDto,
   CreateRevisionDocumentacionDto,

@@ -2,7 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { PrismaProcesoService } from 'src/prisma/proceso/prisma.proceso.service';
 import { CreateRegistroProcesoDto, UpdateRegistroProcesoDto } from '../models/dtos/index.dto';
 
-import { TipoProceso, $Enums } from '.prisma/client-proceso';
+import { TipoProceso, $Enums } from '.prisma/client';
 import { FoliosService } from 'src/shared/folios/folios.service';
 
 @Injectable()
