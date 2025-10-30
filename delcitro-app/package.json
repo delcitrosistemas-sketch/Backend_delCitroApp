@@ -6,9 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run vercel:build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -23,14 +23,8 @@
     "postinstall": "prisma generate",
     "seed": "ts-node prisma/seed.ts",
     "migrate:dev": "prisma migrate dev",
-    "migrate:test": "prisma migrate dev --schema=./prisma/schema.prueba.prisma",
-    "generate:test": "prisma generate --schema=./prisma/schema.prueba.prisma",
-    "reset:test": "prisma migrate reset --schema=./prisma/schema.prueba.prisma",
-    "studio:test": "prisma studio --schema=./prisma/schema.prueba.prisma",
-    "migrate:test-proceso": "prisma migrate dev --schema=./prisma/schema.proceso.prisma",
-    "generate:test-proceso": "prisma generate --schema=./prisma/schema.proceso.prisma",
-    "reset:test-proceso": "prisma migrate reset --schema=./prisma/schema.proceso.prisma",
-    "studio:test-proceso": "prisma studio --schema=./prisma/schema.proceso.prisma"
+    "vercel:build": "cp vercel.json dist/ && cp -r prisma dist/",
+    "dev": "nest start --watch"
   },
   "dependencies": {
     "@faker-js/faker": "^10.0.0",
