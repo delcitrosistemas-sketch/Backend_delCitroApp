@@ -1,13 +1,14 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-  constructor() {
+  constructor(private configService: ConfigService) {
     super({
       datasources: {
         db: {
-          url: 'postgresql://postgres:12345@localhost:5432/PRUEBASDELCITRO',
+          url: configService.get<string>('DATABASE_URL'),
         },
       },
     });

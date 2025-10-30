@@ -7,307 +7,681 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model USUARIOS {
-  id        Int             @id @default(autoincrement())
-  usuario   String          @unique
-  rol       ROLES_GENERALES
-  hash      String
-  hashedRt  String?
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @default(now())
-  avatar    String?
+enum TipoProceso {
+  Convencional
+  Organico
 }
 
-model CLIENTES {
-  id               Int                                  @id @default(autoincrement())
-  primer_nombre    String
-  segundo_nombre   String
-  apellido_paterno String
-  apellido_materno String
-  correo           String
-  telefono         String
-  direccion        String
-  empresa          String
-  createdAt        DateTime                             @default(now())
-  updatedAt        DateTime                             @default(now())
-  reg_embarques    REGISTRO_EMBARQUES[]
-  reg_fruta_pros   REGISTRO_SALIDA_FRUTA_PROCESADA[]
-  reg_salida_prod  REGISTRO_SALIDA_PRODUCTO_TERMINADO[]
+enum RESPUESTA_FORMULARIOS {
+  C
+  NC
+  NA
 }
 
-model EMPLEADOS {
-  id               Int               @id @default(autoincrement())
-  primer_nombre    String
-  segundo_nombre   String?
-  apellido_paterno String?
-  apellido_materno String?
-  correo           String?
-  telefono         String
-  direccion        String?
-  edad             Int?
-  genero           GENEROS
-  area_id          Int
-  departamento_id  Int
-  puesto_id        Int
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @default(now())
-  detalles_id      Int
-  status           String            @default("Activo")
-  area_asignada    AREAS             @relation(fields: [area_id], references: [id])
-  departamento     DEPARTAMENTOS     @relation(fields: [departamento_id], references: [id])
-  detalles         DETALLES_EMPLEADO @relation(fields: [detalles_id], references: [id])
-  puesto           PUESTOS           @relation(fields: [puesto_id], references: [id])
+enum Status_Proceso {
+  En_Proceso
+  Completado
+  Pendiente
+  Rechazado
 }
 
-model DETALLES_EMPLEADO {
-  id            Int         @id @default(autoincrement())
-  incidencia_id Int
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @default(now())
-  incidencias   INCIDENCIA  @relation(fields: [incidencia_id], references: [id])
-  empleado      EMPLEADOS[]
+// Tabla principal que centraliza todo el proceso
+model REGISTRO_PROCESO {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String           @unique
+  fecha                           DateTime         @default(now())
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  variedad                        String
+  destino                         String
+  lote_asignado                   String?
+  status                          Status_Proceso?
+  
+  // Relaciones con todas las áreas del proceso
+  descarga_fruta                  REGISTRO_DESCARGA_FRUTA[]
+  reporte_merma                   REGISTRO_MERMA[]
+  verificacion_detergente         REGISTRO_VERIFICACION_DETERGENTE[]
+  extractores_finisher            REGISTRO_EXTRACTORES_FINISHER[]
+  refrigeracion_pasteurizacion    REGISTRO_REFRIGERACION_PASTEURIZACION[]
+  salida_transporte               REGISTRO_SALIDA_TRANSPORTE[]
+
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  @@map("REGISTRO_PROCESO")   
 }
 
-model INCIDENCIA {
-  id        Int                 @id @default(autoincrement())
-  tipo      String
-  fecha     DateTime
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @default(now())
-  detalles  DETALLES_EMPLEADO[]
+// Área 1: Descarga de fruta
+model REGISTRO_DESCARGA_FRUTA {
+  id                               Int              @id @default(autoincrement())
+  id_proceso                      String
+  folio_fruta                     String           
+  fecha                           DateTime         @default(now())
+  placas_transporte               String
+  variedad                        String
+  destino                         String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  inicio_descarga                 DateTime?
+  fin_descarga                    DateTime?
+  cant_progra_desca               Float?
+  cant_real_desca                 Float?
+  num_orden                       Int?
+  observaciones                   String?
+  proveedor_id                    Int?
+  detalles_id                     Int?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO                @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+  proveedor                       PROVEEDORES?                     @relation(fields: [proveedor_id], references: [id])
+  detalles                        DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO?     @relation(fields: [detalles_id], references: [id])
+
+  @@map("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
 }
 
-model ROLES {
-  id        Int      @id @default(autoincrement())
-  rol       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+// Área 2: Selección (Reporte de Merma)
+model REGISTRO_MERMA {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String
+  fecha                           DateTime         @default(now())
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  variedad                        String
+  num_orden                       Int
+  area                            String
+  hora_pesado                     DateTime?
+  fin_descarga                    DateTime?
+  cant_progra_desca               Float?
+  peso_bruto                      Float
+  peso_tara                       Float
+  peso_neto                       Float
+  observaciones                   String?
+  turno                           Int?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso         REGISTRO_PROCESO                @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_REPORTE_MERMA")
 }
 
-model AREAS {
-  id            Int             @id @default(autoincrement())
-  nombre        String
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @default(now())
-  chofer        CHOFER[]
-  departamentos DEPARTAMENTOS[]
-  empleado      EMPLEADOS[]
+// Área 2: Control de lavado de fruta
+model REGISTRO_VERIFICACION_DETERGENTE {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String
+  folio_fruta                     String
+  fecha                           DateTime         @default(now())
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  hora                            DateTime         @default(now())
+  cant_agua                       Float           // Litros 
+  producto                        String          // nombre del detergente
+  cantidad                        Float           // Litros 
+  concentracion                   Float?          // viene de laboratorio
+  resp_dilucion                   String?
+  num_orden                       Int?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_VERIFICACION_CONCENTRACION_DETERGENTE_LAVADO_FRUTA")
 }
 
-model DEPARTAMENTOS {
-  id        Int         @id @default(autoincrement())
-  nombre    String
-  area_id   Int
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @default(now())
-  chofer    CHOFER[]
-  area      AREAS       @relation(fields: [area_id], references: [id])
-  empleado  EMPLEADOS[]
+// Área 3: Extractores y Finisher
+model REGISTRO_EXTRACTORES_FINISHER {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String
+  folio_fruta                     String
+  fecha                           DateTime         @default(now())
+  producto                        String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  num_extractor                   Int              
+  modelo                          Int
+  medida_extractor                Float
+  hora                            DateTime         @default(now())
+  cap_ext                         Int              
+  presion                         Float
+  ajuste_micro                    String
+  valor_extraccion                String
+  observaciones                   String?
+  hora_finisher_primario          DateTime?
+  psi_finisher_primario           String
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_EXTRACTORES_FINISHER")
 }
 
-model PUESTOS {
-  id        Int         @id @default(autoincrement())
-  nombre    String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @default(now())
-  chofer    CHOFER[]
-  empleado  EMPLEADOS[]
+// Área 4: Refrigeración y Pasteurización
+model REGISTRO_REFRIGERACION_PASTEURIZACION {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String
+  folio_fruta                     String?
+  fecha                           DateTime         @default(now())
+  producto                        String
+  tipo_proceso                    TipoProceso      @default(Convencional)
+  secuencia                       Int              
+  tpf                             Int
+  volumen                         Int
+  inicio_envio                    DateTime         @default(now())
+  fin_envio                       DateTime?
+  tiempo_envio                    DateTime?
+  temp_inicio                     Float
+  temp_medio                      Float
+  temp_fin                        Float
+  operador                        String?
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+
+  @@map("REGISTRO_REFRIGERACION_PASTEURIZACION_JUGO")
 }
 
-model REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
-  id                Int      @id @default(autoincrement())
-  folio             Int      @unique
-  placas_transporte String
-  variedad          String
-  inicio_descarga   DateTime
-  fin_descarga      DateTime
-  cant_progra_desca Float
-  cant_real_desca   Float
-  observaciones     String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @default(now())
+// Área 6: Carga de producto terminado
+model REGISTRO_SALIDA_TRANSPORTE {
+  id                              Int              @id @default(autoincrement())
+  id_proceso                      String
+  fecha_entrada                   DateTime?
+  fecha_salida                    DateTime?
+  fecha_realizo                   DateTime         @default(now())
+  num_placas_unidad               String
+  num_placas_pipa                 String
+  linea_transporte                String
+  firma_chofer                    String
+  nombre_chofer                   String
+  nombre_realizo                  String
+  firma_realizo                   String
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  // Relación con el proceso principal
+  proceso                         REGISTRO_PROCESO @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
+  
+  // Relaciones con las revisiones
+  revision_documentacion          REVISION_DOCUMENTACION[] 
+  revision_transporte             REVISION_TRANSPORTE[] 
+
+  @@map("REGISTRO_SALIDA_TRANSPORTE_PIPA_TERMO")
 }
 
-model REGISTRO_ACEITE_ESCENCIAL {
-  id             Int      @id @default(autoincrement())
-  proceso_id     Int
-  fecha_proceso  DateTime
-  lote           String
-  ton_procesadas Float
-  fecha_vaciado  DateTime
-  silo           Float
-  inv_inicial    Float
-  agregado       Float
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
+model REVISION_DOCUMENTACION {
+  id                              Int              @id @default(autoincrement())
+  registro_salida_id              Int
+  boleta_bascula                  RESPUESTA_FORMULARIOS
+  manifiesto_carga                RESPUESTA_FORMULARIOS
+  certificado_analisis            RESPUESTA_FORMULARIOS
+  certificado_lavado              RESPUESTA_FORMULARIOS
+  certificado_inspeccion          RESPUESTA_FORMULARIOS
+  certificado_fumigacion          RESPUESTA_FORMULARIOS
+  certificado_ult_carga           RESPUESTA_FORMULARIOS
+  certificado_orden_carga         RESPUESTA_FORMULARIOS
+  carga_porte                     RESPUESTA_FORMULARIOS
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  registro_salida_pipa            REGISTRO_SALIDA_TRANSPORTE @relation(fields: [registro_salida_id], references: [id], onDelete: Cascade)
+
+  @@map("REVISION_DOCUMENTACION_SALIDA_TRANSPORTE_PIPA_TERMO")
 }
 
-model REGISTRO_EMBARQUES {
-  id            Int      @id @default(autoincrement())
-  proceso_id    Int
-  tipo          String
-  cliente_id    Int
-  fecha_salida  DateTime
-  lote          String
-  embalaje      String?
-  cantidad      Float
-  boleta        Int
-  peso_neto     Float?
-  litros        Float?
-  galones       Float?
-  libras_solido Float?
-  brix          String?
-  acidez        Float?
-  relacion      String?
-  observaciones String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
-  empresa       CLIENTES @relation(fields: [cliente_id], references: [id])
+model REVISION_TRANSPORTE {
+  id                              Int              @id @default(autoincrement())
+  registro_salida_id              Int
+  corresponde_placas_num_unidad   RESPUESTA_FORMULARIOS
+  corresponde_placas_num_termo_pipa RESPUESTA_FORMULARIOS
+  sin_perforaciones_caja_tanque   RESPUESTA_FORMULARIOS
+  condicion_paredes               RESPUESTA_FORMULARIOS
+  gatas_correas                   RESPUESTA_FORMULARIOS
+  libre_insectos                  RESPUESTA_FORMULARIOS
+  libre_olores                    RESPUESTA_FORMULARIOS
+  libre_contaminacion             RESPUESTA_FORMULARIOS
+  condicion_piso                  RESPUESTA_FORMULARIOS
+  residuos_carga_ant              RESPUESTA_FORMULARIOS
+  fuga                            RESPUESTA_FORMULARIOS
+  sellos_escotilla_val_puerta     RESPUESTA_FORMULARIOS
+  difusor_termo                   RESPUESTA_FORMULARIOS
+  temp_int_termo                  RESPUESTA_FORMULARIOS
+  createdAt                       DateTime         @default(now())
+  updatedAt                       DateTime         @updatedAt
+
+  registro_salida_pipa            REGISTRO_SALIDA_TRANSPORTE @relation(fields: [registro_salida_id], references: [id], onDelete: Cascade)
+
+  @@map("REVISION_TRANSPORTE_SALIDA_TRANSPORTE_PIPA_TERMO")
+}
+
+model DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
+    id                              Int             @id @default(autoincrement())
+    bins                            Int?
+    jaula                           String?
+    estado                          String?
+    municipio                       String?
+    huerta                          String? 
+    observaciones                   String?
+    muestra_id                      Int?   
+    createdAt                       DateTime        @default(now())
+    updatedAt                       DateTime        @default(now()) 
+
+    muestreo                MUESTREOS? @relation(fields: [muestra_id], references: [id])
+    registro_fruta          REGISTRO_DESCARGA_FRUTA[]   
+
+    @@map("DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
+}
+
+
+model MUESTREOS {
+    id                      Int                 @id @default(autoincrement())
+    fecha                   DateTime
+    proveedor_id            Int
+    huertero                String?
+    lote                    String
+    ciudad                  String
+    estado                  String
+    ton_aprox               Float?
+    bta                     Float
+    acidez                  Float
+    rto                     Float
+    rendimiento             Float
+    sabor                   String
+    color                   String
+    aceite                  Float?
+    observaciones           String?
+    analizo                 String
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    registro            DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO[]   
+
+    @@map("MUESTREOS")
 }
 
 model REGISTRO_SALIDA_PRODUCTO_TERMINADO {
-  id             Int      @id @default(autoincrement())
-  proceso_id     Int
-  tipo           String
-  cliente_id     Int
-  fecha_envasado DateTime
-  lote           String
-  embalaje       String
-  cantidad       Float
-  fila_almacen   Int
-  peso_neto      Float
-  litros         Float
-  galones        Float?
-  libras_solido  Float?
-  brix           Float?
-  acidez         Float?
-  relacion       Float?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now())
-  empresa        CLIENTES @relation(fields: [cliente_id], references: [id])
+    id                  Int             @id @default(autoincrement())
+    proceso_id          Int
+    tipo                String
+    cliente_id             Int
+    fecha_envasado      DateTime
+    lote                String
+    embalaje            String
+    cantidad            Float // 
+    fila_almacen        Int
+    peso_neto           Float
+    litros              Float
+    galones             Float?
+    libras_solido       Float?
+    brix                Float?
+    acidez              Float?
+    relacion            Float?
+    createdAt           DateTime        @default(now())
+    updatedAt           DateTime        @default(now()) 
+
+    empresa             CLIENTES        @relation(fields: [cliente_id], references: [id])
+
+    @@map("REGISTRO_SALIDA_PRODUCTO_TERMINADO")
+
 }
 
-model REGISTRO_SALIDA_FRUTA_PROCESADA {
-  id            Int      @id @default(autoincrement())
-  doc_nro       String
-  fecha         DateTime
-  placa         String
-  cliente_id    Int
-  producto      String
-  peso_ingreso  Float
-  peso_salida   Float
-  peso_neto     Float
-  chofer        String
-  transportista String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @default(now())
-  empresa       CLIENTES @relation(fields: [cliente_id], references: [id])
+
+model USUARIOS {
+    id              Int       @id @default(autoincrement())
+    usuario         String @unique
+    rol             ROLES_GENERALES
+    hash            String
+    hashedRt        String?
+    avatar          String?
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @default(now())
+
+    archivosSGC     DOCUMENTOS_SGC[]
+    permisos        USUARIOS_PERMISOS[]
+
+    @@map("USUARIOS")
+
+}
+
+model USUARIOS_PERMISOS {
+    id                  Int                 @id @default(autoincrement())
+    usuario_id          Int
+    area_id             Int
+    rol_area            ROLES_AREA
+    activo              Boolean             @default(true)
+    createdAt           DateTime            @default(now())
+    updatedAt           DateTime            @default(now())
+
+    usuario             USUARIOS            @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+    area                AREAS               @relation(fields: [area_id], references: [id])
+
+    permisos_modulo     PERMISOS_MODULO[]
+
+    @@unique([usuario_id, area_id])
+    @@map("USUARIOS_PERMISOS")
+}
+
+model CLIENTES {
+    id                      Int             @id @default(autoincrement())
+    primer_nombre           String
+    segundo_nombre          String
+    apellido_paterno        String
+    apellido_materno        String
+    correo                  String
+    telefono                String 
+    direccion               String
+    empresa                 String
+    createdAt               DateTime        @default(now())
+    updatedAt               DateTime        @default(now())
+
+    reg_salida_prod         REGISTRO_SALIDA_PRODUCTO_TERMINADO[]
+
+    @@map("CLIENTES")
+}
+
+model PROVEEDORES {
+    id                      Int             @id @default(autoincrement())
+    nombre                  String?
+    empresa                 String
+    direccion               String?
+    estado                  String
+    codigoPostal            String?
+    pais                    String          @default("México")
+    telefono                String
+    email                   String?
+    createdAt               DateTime        @default(now())
+    updatedAt               DateTime        @default(now())
+
+    reg_entrada_fruta       REGISTRO_DESCARGA_FRUTA[]
+
+    @@map("PROVEEDORES")
+}
+
+model EMPLEADOS {
+    id                      Int                         @id @default(autoincrement())
+    num_emp                 Int                         @default(autoincrement())
+    primer_nombre           String
+    segundo_nombre          String?
+    apellido_paterno        String?
+    apellido_materno        String?
+    correo                  String?
+    telefono                String
+    direccion               String?
+    edad                    Int?
+    genero                  GENEROS
+    status                  String              @default("Activo")
+    area_id                 Int
+    departamento_id         Int
+    puesto_id               Int
+    detalles_id             Int
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    area_asignada           AREAS               @relation(fields: [area_id], references: [id])
+    departamento            DEPARTAMENTOS       @relation(fields: [departamento_id], references: [id])
+    puesto                  PUESTOS             @relation(fields: [puesto_id], references: [id])
+    detalles                DETALLES_EMPLEADO   @relation(fields: [detalles_id], references: [id])
+
+    @@map("EMPLEADOS")
+}
+
+model DETALLES_EMPLEADO {
+    id                      Int                         @id @default(autoincrement())
+    incidencia_id           Int
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    empleado                EMPLEADOS[]
+
+    incidencias             INCIDENCIAS          @relation(fields: [incidencia_id], references: [id])
+
+    @@map("DETALLES_EMPLEADO")
+}
+
+model INCIDENCIAS {
+    id                      Int                         @id @default(autoincrement())
+    tipo                    String
+    fecha                   DateTime
+
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    detalles                DETALLES_EMPLEADO[]
+    
+    @@map("INCIDENCIAS")
+}
+
+model ROLES {
+    id              Int             @id @default(autoincrement())
+    rol             String
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now())
+    
+    @@map("ROLES")
+}
+
+model AREAS {
+    id              Int             @id @default(autoincrement())
+    nombre          String
+    codigo          String?          @unique
+    activo          Boolean?         @default(true)
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now()) 
+
+    empleado        EMPLEADOS[]
+    departamentos   DEPARTAMENTOS[]
+    chofer          CHOFER[]
+    permisos        USUARIOS_PERMISOS[]
+    modulos         MODULOS_AREA[] 
+
+    @@map("AREAS")
+
+}
+
+model MODULOS_AREA {
+    id              Int             @id @default(autoincrement())
+    area_id         Int
+    nombre          String          // Ej: "Muestreos", "Descarga", "Finanzas"
+    codigo          String          // Ej: "muestreos", "descarga", "finanzas"
+    url             String?         // URL del módulo
+    icono           String?         // Nombre del icono
+    orden           Int             @default(0)
+    activo          Boolean         @default(true)
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now())
+
+    area            AREAS           @relation(fields: [area_id], references: [id])
+    permisos        PERMISOS_MODULO[]
+
+    @@unique([area_id, codigo])
+    @@map("MODULOS_AREA")
+}
+
+model PERMISOS_MODULO {
+    id              Int             @id @default(autoincrement())
+    usuario_permiso_id  Int?
+    modulo_id       Int
+    rol_area        ROLES_AREA
+    puede_crear     Boolean         @default(false)
+    puede_leer      Boolean         @default(false)
+    puede_actualizar Boolean        @default(false)
+    puede_eliminar  Boolean         @default(false)
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now())
+
+    modulo          MODULOS_AREA    @relation(fields: [modulo_id], references: [id], onDelete: Cascade)
+    usuario_permiso USUARIOS_PERMISOS? @relation(fields: [usuario_permiso_id], references: [id], onDelete: Cascade)
+
+    @@unique([modulo_id, rol_area, usuario_permiso_id])
+    @@map("PERMISOS_MODULO")
+}
+
+model DEPARTAMENTOS {
+    id              Int             @id @default(autoincrement())
+    nombre          String
+    area_id         Int
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now())
+    
+    area            AREAS           @relation(fields: [area_id], references: [id])
+    empleado        EMPLEADOS[]
+    chofer          CHOFER[]
+
+    @@map("DEPARTAMENTOS")
+
+}
+
+model PUESTOS {
+    id              Int             @id @default(autoincrement())
+    nombre          String
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @default(now()) 
+
+    empleado        EMPLEADOS[]
+    chofer          CHOFER[]
+
+    @@map("PUESTOS")
+
+}
+
+enum ROLES_AREA {
+    ADMINISTRADOR_AREA  // Administrador completo del área
+    SUPERVISOR_AREA     // Supervisor con permisos limitados
+    OPERADOR           // Solo consulta y operaciones básicas
+    VISUALIZADOR       // Solo consulta
 }
 
 model CHOFER {
-  id               Int           @id @default(autoincrement())
-  primer_nombre    String
-  segundo_nombre   String?
-  apellido_paterno String?
-  apellido_materno String?
-  telefono         String
-  direccion        String?
-  edad             Int?
-  genero           GENEROS
-  area_id          Int
-  departamento_id  Int
-  puesto_id        Int
-  vehiculo_id      Int
-  placa            String
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @default(now())
-  area             AREAS         @relation(fields: [area_id], references: [id])
-  departamento     DEPARTAMENTOS @relation(fields: [departamento_id], references: [id])
-  puesto           PUESTOS       @relation(fields: [puesto_id], references: [id])
-  vehiculo         TRANSPORTE    @relation(fields: [vehiculo_id], references: [id])
+    id                      Int                 @id @default(autoincrement())
+    primer_nombre           String
+    segundo_nombre          String?
+    apellido_paterno        String?
+    apellido_materno        String?
+    telefono                String
+    direccion               String?
+    edad                    Int?
+    genero                  GENEROS
+    area_id                 Int
+    departamento_id         Int
+    puesto_id               Int // Chofer
+    vehiculo_id             Int // Transporte
+    placa                   String
+    empresa                 String?
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    area                    AREAS               @relation(fields: [area_id], references: [id])
+    departamento            DEPARTAMENTOS       @relation(fields: [departamento_id], references: [id])
+    puesto                  PUESTOS             @relation(fields: [puesto_id], references: [id])
+    vehiculo                TRANSPORTE          @relation(fields: [vehiculo_id], references: [id])          
+    
+    @@map("CHOFER")
+
 }
 
 model TRANSPORTE {
-  id        Int      @id @default(autoincrement())
-  vehiculo  String
-  tipo      String
-  color     String
-  placa     String
-  ejes      Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  chofer    CHOFER[]
+    id                      Int                 @id @default(autoincrement())
+    vehiculo                String
+    tipo                    String
+    color                   String
+    placa                   String
+    ejes                    Float
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+
+    chofer                  CHOFER[]
+
+    @@map("TRANSPORTE")
+
 }
 
+model DOCUMENTOS_SGC {
+    id                      Int                 @id @default(autoincrement())
+    tipo                    String
+    archivo                 String
+    nombre                  String
+    titulo                  String
+    descripcion             String?
+    archivoUrl              String    
+    extension               String?    
+    createdAt               DateTime            @default(now())
+    updatedAt               DateTime            @default(now())
+    usuario_id              Int?
+
+    usuario       USUARIOS? @relation(fields: [usuario_id], references: [id])
+
+    @@map("DOCUMENTOS_SGC")
+}
+
+// Datos que deben estar en las tablas
+
 enum ROLES_GENERALES {
-  SUPER_ADMIN
-  USUARIO
-  ADMIN
-  GERENTE
-  SUPERVISOR
+    SUPER_ADMIN
+    USUARIO
+    ADMIN
+    GERENTE
+    SUPERVISOR
 }
 
 enum GENEROS {
-  MASCULINO
-  FEMENINO
+    MASCULINO
+    FEMENINO
+    OTROS
 }
 
 enum ESTADOS_DE_PROCESO {
-  CARGA
-  DESCARGA
-  EXTRACCION
-  HOMOGENEANIZACION
-  REFRIGERACION
-  EMPAQUE
-  ENVIADO
-  RECIBIDO
-  ACEPTADO
-  PENDIENTE
-  COMPLETADO
-  CANCELADO
-  RECHAZADO
+    CARGA
+    DESCARGA
+    EXTRACCION
+    HOMOGENEANIZACION
+    REFRIGERACION
+    EMPAQUE
+    ENVIADO
+    RECIBIDO
+    ACEPTADO
+    PENDIENTE
+    COMPLETADO
+    CANCELADO
+    RECHAZADO
 }
 
 enum AREAS_GENERALES {
-  PROCESO
-  ADMINISTRATIVO
-  CALIDAD
-  REFRIGERACION
-  MANTENIMIENTO
-  ALMACEN
-  LIMPIEZA
-  TRANSPORTE
+    PROCESO
+    ADMINISTRATIVO
+    CALIDAD
+    REFRIGERACION
+    MANTENIMIENTO
+    ALMACEN
+    LIMPIEZA
+    TRANSPORTE
 }
 
 enum AREAS_DE_PROCESO {
-  DESCARGA
-  SELECCION_Y_LAVADO
-  EXTRACCION_JUGO
-  EXTRACCION_PULPA
-  EXTRACCION_ACEITE
-  HOMOGENEANIZACION
-  ENVASADO
-  CASCARILLA
-  PATIO
-  CLORIZACION_AGUA
+    DESCARGA
+    SELECCION_Y_LAVADO
+    EXTRACCION_JUGO
+    EXTRACCION_PULPA
+    EXTRACCION_ACEITE
+    HOMOGENEANIZACION
+    ENVASADO
+    CASCARILLA
+    PATIO
+    CLORIZACION_AGUA
 }
 
 enum AREAS_DE_CALIDAD {
-  LABORATORIO
+    LABORATORIO
 }
 
 enum AREAS_ADMINISTRATIVAS {
-  FINANZAS
-  SISTEMAS_CALIDAD
-  ASEGURACION_CALIDAD
-  RECURSOS_HUMANOS
-  VENTAS
-  COMPRAS
+    FINANZAS
+    SISTEMAS_CALIDAD
+    ASEGURACION_CALIDAD
+    RECURSOS_HUMANOS
+    VENTAS
+    COMPRAS
 }
 
 enum AREAS_ALMACEN {
-  MATERIAL_EMPAQUE
-  PRODUCTOS_QUIMICOS
-  PRODUCTOS_TERMINADOS
-  REFACCIONES
+    MATERIAL_EMPAQUE
+    PRODUCTOS_QUIMICOS
+    PRODUCTOS_TERMINADOS
+    REFACCIONES
 }
+

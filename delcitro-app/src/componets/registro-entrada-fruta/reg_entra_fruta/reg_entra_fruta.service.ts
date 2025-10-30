@@ -14,36 +14,44 @@ export class RegEntraFrutaService {
 
   async create(data: CreateRegistroDto) {
     const folio = await this.folioService.generarFolioRecepcionFruta('Mandarina');
-    return this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.create({
-      data: {
-        folio,
-        fecha: new Date(data.fecha),
-        boleta: data.boleta,
-        placas_transporte: data.placas_transporte,
-        chofer: data.chofer,
-        variedad: data.variedad,
-        destino: data.destino,
-        inicio_descarga: data.inicio_descarga ? new Date(data.inicio_descarga) : null,
-        fin_descarga: data.fin_descarga ? new Date(data.fin_descarga) : null,
-        cant_progra_desca: data.cant_progra_desca,
-        cant_real_desca: data.cant_real_desca,
 
-        proveedor: {
-          connect: { id: data.proveedor_id },
-        },
+    const createData: any = {
+      id_proceso: '',
+      folio_fruta: folio,
+      fecha: new Date(data.fecha),
+      placas_transporte: data.placas_transporte,
+      variedad: data.variedad,
+      destino: data.destino,
+      inicio_descarga: data.inicio_descarga ? new Date(data.inicio_descarga) : null,
+      fin_descarga: data.fin_descarga ? new Date(data.fin_descarga) : null,
+      cant_progra_desca: data.cant_progra_desca,
+      cant_real_desca: data.cant_real_desca,
+      createdAt: new Date(data.fecha),
+      updatedAt: new Date(data.fecha),
+    };
 
-        detalles: {
-          create: {
-            bins: data.detalles?.bins ?? null,
-            jaula: data.detalles?.jaula ?? null,
-            estado: data.detalles?.estado ?? null,
-            municipio: data.detalles?.municipio ?? null,
-            huerta: data.detalles?.huerta ?? null,
-            observaciones: data.detalles?.observaciones ?? null,
-            muestra_id: data.detalles?.muestra_id ?? null,
-          },
+    if (data.proveedor_id) {
+      createData.proveedor = {
+        connect: { id: data.proveedor_id },
+      };
+    }
+
+    if (data.detalles) {
+      createData.detalles = {
+        create: {
+          bins: data.detalles?.bins ?? null,
+          jaula: data.detalles?.jaula ?? null,
+          estado: data.detalles?.estado ?? null,
+          municipio: data.detalles?.municipio ?? null,
+          huerta: data.detalles?.huerta ?? null,
+          observaciones: data.detalles?.observaciones ?? null,
+          muestra_id: data.detalles?.muestra_id ?? null,
         },
-      },
+      };
+    }
+
+    return this.prisma.rEGISTRO_DESCARGA_FRUTA.create({
+      data: createData,
       include: {
         proveedor: true,
         detalles: { include: { muestreo: true } },
@@ -52,7 +60,7 @@ export class RegEntraFrutaService {
   }
 
   async findAll() {
-    const registros = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.findMany({
+    const registros = await this.prisma.rEGISTRO_DESCARGA_FRUTA.findMany({
       include: {
         proveedor: true,
         detalles: { include: { muestreo: true } },
@@ -75,7 +83,7 @@ export class RegEntraFrutaService {
   }
 
   async findOne(id: number) {
-    const registro = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.findUnique({
+    const registro = await this.prisma.rEGISTRO_DESCARGA_FRUTA.findUnique({
       where: { id },
       include: {
         proveedor: true,
@@ -102,7 +110,7 @@ export class RegEntraFrutaService {
   async update(id: number, data: UpdateRegistroDto) {
     await this.findOne(id);
 
-    return this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.update({
+    return this.prisma.rEGISTRO_DESCARGA_FRUTA.update({
       where: { id },
       data,
       include: {
@@ -115,7 +123,7 @@ export class RegEntraFrutaService {
   async remove(id: number) {
     await this.findOne(id);
 
-    return this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.delete({
+    return this.prisma.rEGISTRO_DESCARGA_FRUTA.delete({
       where: { id },
     });
   }

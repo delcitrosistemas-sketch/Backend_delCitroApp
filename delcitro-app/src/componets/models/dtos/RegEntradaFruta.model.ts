@@ -53,12 +53,6 @@ class CreateRegistroDto {
   @Type(() => Date)
   fecha: Date;
 
-  @IsNotEmpty({ message: 'La boleta es requerida' })
-  @IsInt({ message: 'La boleta debe ser un número entero' })
-  @Min(1000, { message: 'La boleta debe tener al menos 4 dígitos' })
-  @Max(999999, { message: 'La boleta no puede exceder 6 dígitos' })
-  boleta: number;
-
   @IsNotEmpty({ message: 'Las placas de transporte son requeridas' })
   @IsString({ message: 'Las placas deben ser un texto' })
   @Matches(/^[A-Z0-9-]+$/, { message: 'Formato de placas inválido' })
@@ -68,13 +62,9 @@ class CreateRegistroDto {
   @IsString({ message: 'La variedad debe ser un texto' })
   variedad: string;
 
-  @IsNotEmpty({ message: 'El destino es requerido' })
+  @IsNotEmpty({ message: 'El destino es requerida' })
   @IsString({ message: 'El destino debe ser un texto' })
   destino: string;
-
-  @IsNotEmpty({ message: 'El chofer es requerido' })
-  @IsString({ message: 'El chofer debe ser un texto' })
-  chofer: string;
 
   @IsOptional()
   @IsDate({ message: 'La fecha de inicio de descarga debe ser válida' })
@@ -98,9 +88,9 @@ class CreateRegistroDto {
   @Max(100000, { message: 'La cantidad real no puede exceder 100,000' })
   cant_real_desca?: number;
 
-  @IsNotEmpty({ message: 'El proveedor es requerido' })
+  @IsOptional() // Cambia a opcional
   @IsInt({ message: 'El ID del proveedor debe ser un número entero' })
-  proveedor_id: number;
+  proveedor_id?: number; // Cambia a opcional
 
   @IsOptional()
   @ValidateNested()

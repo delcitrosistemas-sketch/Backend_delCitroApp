@@ -17,9 +17,14 @@ import { LotesModule } from './shared/lotes/lotes.module';
 import { BoletasModule } from './shared/boletas/boletas.module';
 import { PrismaProcesoModule } from './prisma/proceso/prisma.proceso.module';
 import { ProcesoModule } from './produccion/proceso/proceso.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     PrismaModule,
     PrismaProcesoModule,
     AuthModule,

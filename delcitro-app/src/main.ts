@@ -2,9 +2,9 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AtGuard } from './common/guards';
-import cookieParser from 'cookie-parser';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -37,11 +37,10 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  console.log('🚀 Servidor iniciado en puerto 3001');
-  console.log('🍪 CORS configurado para cookies httpOnly');
+  console.log('Servidor iniciado en puerto 3001');
+  console.log('CORS configurado para cookies httpOnly');
   //app.useGlobalGuards(app.get(AtGuard));
   await app.listen(3001, '0.0.0.0');
-  console.log('🚀 Servidor ejecutándose en puerto 3001');
-
+  console.log('Servidor ejecutándose en puerto 3001');
 }
 bootstrap();

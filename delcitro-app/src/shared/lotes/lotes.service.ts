@@ -10,7 +10,7 @@ export class LotesService {
     const temporada = (parseInt(now.getFullYear().toString()) + 400).toString();
     let prefix = 'DEL';
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), 0, 1),
@@ -34,7 +34,7 @@ export class LotesService {
     const now = new Date();
     const temporada = now.getFullYear().toString().slice(-2);
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), now.getMonth(), 1),
@@ -55,7 +55,7 @@ export class LotesService {
     const now = new Date();
     const year = now.getFullYear().toString().slice(-2);
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), now.getMonth(), 1),
@@ -73,7 +73,7 @@ export class LotesService {
     const now = new Date();
     const year = now.getFullYear().toString().slice(-2);
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), now.getMonth(), 1),

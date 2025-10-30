@@ -10,7 +10,7 @@ export class CodigosService {
     const now = new Date();
     const year = now.getFullYear().toString();
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), now.getMonth(), 1),

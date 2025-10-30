@@ -82,7 +82,7 @@ export class FoliosService {
     const mesMap = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
     const mes = mesMap[now.getMonth()];
 
-    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA_PARA_PROCESO.count({
+    const count = await this.prisma.rEGISTRO_DESCARGA_FRUTA.count({
       where: {
         fecha: {
           gte: new Date(now.getFullYear(), 0, 1),
