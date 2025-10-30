@@ -14,6 +14,7 @@ async function bootstrap() {
         'http://192.168.137.103:3000',
         'http://localhost:3001',
         'http://192.168.137.103:3001',
+        'https://delcitro-app.vercel.app/',
       ],
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       allowedHeaders: [
@@ -37,10 +38,13 @@ async function bootstrap() {
     prefix: '/uploads/',
   });
 
-  console.log('Servidor iniciado en puerto 3001');
-  console.log('CORS configurado para cookies httpOnly');
-  //app.useGlobalGuards(app.get(AtGuard));
-  await app.listen(3001, '0.0.0.0');
-  console.log('Servidor ejecutándose en puerto 3001');
+  const port = process.env.PORT || 3001;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Servidor ejecutándose en puerto ${port}`);
 }
-bootstrap();
+if (process.env.NODE_ENV !== 'production') {
+  bootstrap();
+}
+
+// Export para producción (Vercel)
+export default bootstrap;
