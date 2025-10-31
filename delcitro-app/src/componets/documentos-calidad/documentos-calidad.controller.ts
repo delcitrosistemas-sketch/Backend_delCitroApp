@@ -9,32 +9,36 @@ import {
   UploadedFile,
   UseInterceptors,
   ParseIntPipe,
-  HttpCode,
-  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
 import { DocumentosCalidadService } from './documentos-calidad.service';
 import { extname } from 'path';
 import { Public } from '../../common/decorators';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
+import * as multer from 'multer';
 
 @Controller('doc-sgc')
 export class DocumentosCalidadController {
-  constructor(private readonly service: DocumentosCalidadService) {}
+  constructor(
+    private readonly service: DocumentosCalidadService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
-  @Public()
-  @Post('/upload')
-  @HttpCode(HttpStatus.CREATED)
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/docs',
-        filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, uniqueSuffix + extname(file.originalname));
-        },
+      storage: multer.memoryStorage(), // No escribe en disco
     }),
-  }))
+  )
+  @Post('upload')
+  async uploadDocumento(@UploadedFile() file: Express.Multer.File) {
+    const result = await this.cloudinaryService.uploadImage(file);
+    return {
+      message: 'Documento subido correctamente',
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+  }
+
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Body() body: { titulo: string; descripcion?: string; tipo: string; usuario_id?: number },
