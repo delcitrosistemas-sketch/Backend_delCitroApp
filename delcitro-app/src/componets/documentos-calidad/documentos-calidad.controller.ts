@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentosCalidadService } from './documentos-calidad.service';
-import { extname } from 'path';
 import { Public } from '../../common/decorators';
 import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 import * as multer from 'multer';
@@ -24,37 +23,15 @@ export class DocumentosCalidadController {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: multer.memoryStorage(), // No escribe en disco
-    }),
-  )
   @Post('upload')
-  async uploadDocumento(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.cloudinaryService.uploadImage(file);
+  @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    const result = await this.cloudinaryService.uploadStream(file);
     return {
-      message: 'Documento subido correctamente',
+      message: 'Subida completada',
       url: result.secure_url,
       public_id: result.public_id,
     };
-  }
-
-  async upload(
-    @UploadedFile() file: Express.Multer.File,
-    @Body() body: { titulo: string; descripcion?: string; tipo: string; usuario_id?: number },
-  ) {
-    return this.service.create({
-      titulo: body.titulo,
-      descripcion: body.descripcion,
-      tipo: body.tipo,
-      archivo: file.originalname,
-      nombre: file.originalname,
-      archivoUrl: `/uploads/docs/${file.filename}`,
-      extension: extname(file.originalname).replace('.', ''),
-      ...(body.usuario_id && {
-        usuario: { connect: { id: Number(body.usuario_id) } },
-      }),
-    });
   }
 
   @Public()
