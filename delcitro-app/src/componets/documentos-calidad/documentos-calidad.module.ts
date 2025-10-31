@@ -4,6 +4,6 @@ import { DocumentosCalidadService } from './documentos-calidad.service';
 
 @Module({
   controllers: [DocumentosCalidadController],
-  providers: [DocumentosCalidadService]
+  providers: [DocumentosCalidadService],
 })
 export class DocumentosCalidadModule {}

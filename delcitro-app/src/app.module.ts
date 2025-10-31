@@ -17,6 +17,7 @@ import { LotesModule } from './shared/lotes/lotes.module';
 import { BoletasModule } from './shared/boletas/boletas.module';
 import { ProcesoModule } from './produccion/proceso/proceso.module';
 import { ConfigModule } from '@nestjs/config';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ConfigModule } from '@nestjs/config';
     LotesModule,
     BoletasModule,
     ProcesoModule,
+    CloudinaryModule,
   ],
   exports: [
     UsuariosModule,
@@ -49,6 +51,7 @@ import { ConfigModule } from '@nestjs/config';
     CodigosModule,
     LotesModule,
     PrismaModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [

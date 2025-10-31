@@ -17,20 +17,21 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import { UsuariosService } from './usuarios.service';
 import { GetCurrentUser, GetCurrentUserId } from '../../common/decorators';
 import { Prisma } from '@prisma/client';
 import { AssignAreaDto } from '../../auth/dto';
 import { AtGuard } from '../../common/guards';
 import { PrismaService } from '../../prisma/prisma.service';
+import * as multer from 'multer';
+import { CloudinaryService } from '../../cloudinary/cloudinary.service';
 
 @Controller('usuarios')
 export class UsuariosController {
   constructor(
     private userService: UsuariosService,
     private prisma: PrismaService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
 
   @Post('/crear-usuario')
@@ -93,19 +94,21 @@ export class UsuariosController {
     return this.userService.infoUserProfileById(userId);
   }
 
-  @Post('/avatar')
   @UseInterceptors(
-    FileInterceptor('avatar', {
-      storage: diskStorage({
-        destination: './uploads/avatars',
-        filename: (req, file, callback) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
-        },
-      }),
+    FileInterceptor('file', {
+      storage: multer.memoryStorage(), // No escribe en disco
     }),
   )
+  @Post('upload')
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    const result = await this.cloudinaryService.uploadImage(file);
+    return {
+      message: 'Archivo subido correctamente a Cloudinary',
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+  }
+
   async uploadAvatar(
     @UploadedFile() file: Express.Multer.File,
     @GetCurrentUserId() userId: number,
