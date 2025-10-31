@@ -11,11 +11,9 @@ async function bootstrap() {
     cors: {
       origin: [
         'http://localhost:3000',
-        'http://192.168.137.103:3000',
         'http://localhost:3001',
-        'http://192.168.137.103:3001',
-        'https://delcitro-app.vercel.app/',
-      ],
+        process.env.FRONTEND_URL,
+      ].filter(Boolean),
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
       allowedHeaders: [
         'Content-Type',
@@ -31,20 +29,26 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe());
+  
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  
   const reflector = new Reflector();
   app.useGlobalGuards(new AtGuard(reflector));
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
-    prefix: '/uploads/',
-  });
-
+  
   const port = process.env.PORT || 3001;
+  
   await app.listen(port, '0.0.0.0');
-  console.log(`Servidor ejecutándose en puerto ${port}`);
-}
-if (process.env.NODE_ENV !== 'production') {
-  bootstrap();
+  console.log(`ervidor ejecutándose en puerto ${port}`);
+  console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
 }
 
-// Export para producción (Vercel)
-export default bootstrap;
+bootstrap().catch((error) => {
+  console.error('Error al iniciar la aplicación:', error);
+  process.exit(1);
+});
