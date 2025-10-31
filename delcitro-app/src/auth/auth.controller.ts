@@ -16,7 +16,7 @@ import { AuthDto } from './dto';
 import { Tokens } from './types';
 import { RtGuad } from '../common/guards';
 import type { Response, Request } from 'express';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 

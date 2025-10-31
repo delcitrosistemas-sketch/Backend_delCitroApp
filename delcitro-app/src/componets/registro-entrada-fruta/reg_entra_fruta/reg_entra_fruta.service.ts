@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { format } from 'date-fns'; // Cambia esta importación
 import { es } from 'date-fns/locale';
-import { CreateRegistroDto, UpdateRegistroDto } from 'src/componets/models/index.model';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { FoliosService } from 'src/shared/folios/folios.service';
+import { CreateRegistroDto, UpdateRegistroDto } from '../../../componets/models/index.model';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { FoliosService } from '../../../shared/folios/folios.service';
 
 @Injectable()
 export class RegEntraFrutaService {

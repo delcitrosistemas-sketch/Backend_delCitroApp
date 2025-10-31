@@ -21,7 +21,7 @@ import { CargaProductoTerminadoController } from '../registros-proceso/carga-pro
 import { LavadoController } from '../registros-proceso/lavado/lavado.controller';
 
 // Services
-import { FoliosService } from 'src/shared/folios/folios.service';
+import { FoliosService } from '../../shared/folios/folios.service';
 import { DescargaService } from '../registros-proceso/descarga-fruta/descarga.service';
 import { SeleccionService } from '../registros-proceso/seleccion/seleccion.service';
 import { ExtraccionService } from '../registros-proceso/extraccion/extraccion.service';

@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import { RESPUESTA_FORMULARIOS } from '.prisma/client';
 import {
   CreateRegistroSalidaTransporteDto,
@@ -13,7 +13,7 @@ import {
   UpdateRegistroSalidaTransporteDto,
   UpdateRevisionDocumentacionDto,
   UpdateRevisionTransporteDto,
-} from 'src/produccion/models/dtos/index.dto';
+} from '../../../produccion/models/dtos/index.dto';
 
 @Injectable()
 export class CargaProductoTerminadoService {

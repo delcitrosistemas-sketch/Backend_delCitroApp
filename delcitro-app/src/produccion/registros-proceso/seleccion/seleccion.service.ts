@@ -4,8 +4,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateReporteMermaDto, UpdateReporteMermaDto } from 'src/produccion/models/dtos/index.dto';
+import { PrismaService } from '../../../prisma/prisma.service';
+import {
+  CreateReporteMermaDto,
+  UpdateReporteMermaDto,
+} from '../../../produccion/models/dtos/index.dto';
 
 @Injectable()
 export class SeleccionService {

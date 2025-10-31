@@ -14,7 +14,7 @@ import { LavadoService } from './lavado.service';
 import {
   CreateVerificacionDetergenteDto,
   UpdateVerificacionDetergenteDto,
-} from 'src/produccion/models/dtos/index.dto';
+} from '../../../produccion/models/dtos/index.dto';
 
 @Controller('proceso/lavado')
 export class LavadoController {

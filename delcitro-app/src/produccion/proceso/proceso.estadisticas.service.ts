@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { FoliosService } from 'src/shared/folios/folios.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { FoliosService } from '../../shared/folios/folios.service';
 import {
   EstadisticaAnual,
   EstadisticaMensual,

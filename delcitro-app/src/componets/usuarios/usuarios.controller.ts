@@ -22,9 +22,9 @@ import { extname } from 'path';
 import { UsuariosService } from './usuarios.service';
 import { GetCurrentUser, GetCurrentUserId } from '../../common/decorators';
 import { Prisma } from '@prisma/client';
-import { AssignAreaDto } from 'src/auth/dto';
+import { AssignAreaDto } from '../../auth/dto';
 import { AtGuard } from '../../common/guards';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Controller('usuarios')
 export class UsuariosController {

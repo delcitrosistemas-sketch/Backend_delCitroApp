@@ -13,7 +13,7 @@ import { ExtraccionService } from './extraccion.service';
 import {
   CreateExtractoresFinisherDto,
   UpdateExtractoresFinisherDto,
-} from 'src/produccion/models/dtos/index.dto';
+} from '../../../produccion/models/dtos/index.dto';
 
 @Controller('proceso/extraccion')
 export class ExtraccionController {

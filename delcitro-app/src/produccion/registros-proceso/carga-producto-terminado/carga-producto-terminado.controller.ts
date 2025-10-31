@@ -17,7 +17,7 @@ import {
   UpdateRegistroSalidaTransporteDto,
   UpdateRevisionDocumentacionDto,
   UpdateRevisionTransporteDto,
-} from 'src/produccion/models/dtos/index.dto';
+} from '../../../produccion/models/dtos/index.dto';
 
 @Controller('proceso/carga-producto-terminado')
 export class CargaProductoTerminadoController {

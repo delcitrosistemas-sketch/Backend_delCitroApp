@@ -12,7 +12,10 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { SeleccionService } from './seleccion.service';
-import { CreateReporteMermaDto, UpdateReporteMermaDto } from 'src/produccion/models/dtos/index.dto';
+import {
+  CreateReporteMermaDto,
+  UpdateReporteMermaDto,
+} from '../../../produccion/models/dtos/index.dto';
 
 @Controller('proceso/seleccion')
 export class SeleccionController {

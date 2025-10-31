@@ -14,7 +14,7 @@ import {
 import {
   CreateDescargaFrutaDto,
   UpdateDescargaFrutaDto,
-} from 'src/produccion/models/dtos/index.dto';
+} from '../../../produccion/models/dtos/index.dto';
 import { DescargaService } from './descarga.service';
 
 @Controller('proceso/descarga')

@@ -13,7 +13,7 @@ import { RefrigeracionService } from './refrigeracion.service';
 import {
   CreateRefrigeracionPasteurizacionDto,
   UpdateRefrigeracionPasteurizacionDto,
-} from 'src/produccion/models/dtos/index.dto';
+} from '../../../produccion/models/dtos/index.dto';
 
 @Controller('proceso/refrigeracion')
 export class RefrigeracionController {

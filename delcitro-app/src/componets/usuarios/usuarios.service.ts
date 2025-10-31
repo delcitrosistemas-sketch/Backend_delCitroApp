@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { ProfileDto } from '../models/dtos/Usuario.model';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-import { ModuloArea, UserPermissions } from 'src/componets/models/index.model';
+import { ModuloArea, UserPermissions } from '../../componets/models/index.model';
 import { ROLES_AREA } from '@prisma/client';
 @Injectable()
 export class UsuariosService {
