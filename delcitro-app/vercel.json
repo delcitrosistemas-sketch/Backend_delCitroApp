@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/index.ts": {
-      "runtime": "nodejs20.x",
-      "includeFiles": "dist/**"
-    }
-  },
   "builds": [
     {
       "src": "src/main.ts",
@@ -15,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.ts"
+      "dest": "src/main.ts"
     }
   ]
 }
