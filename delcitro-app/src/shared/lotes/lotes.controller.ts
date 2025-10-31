@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { LotesService } from './lotes.service';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../common/decorators';
 
 @Controller('formato/lotes')
 export class LotesController {

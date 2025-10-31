@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { BoletasService } from './boletas.service';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../common/decorators';
 
 @Controller('/formato/boletas')
 export class BoletasController {

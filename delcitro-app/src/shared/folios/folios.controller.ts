@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { FoliosService } from './folios.service';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../common/decorators';
 
 @Controller('formato/folios')
 export class FoliosController {

@@ -20,10 +20,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { UsuariosService } from './usuarios.service';
-import { GetCurrentUser, GetCurrentUserId } from 'src/common/decorators';
+import { GetCurrentUser, GetCurrentUserId } from '../../common/decorators';
 import { Prisma } from '@prisma/client';
 import { AssignAreaDto } from 'src/auth/dto';
-import { AtGuard } from 'src/common/guards';
+import { AtGuard } from '../../common/guards';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Controller('usuarios')

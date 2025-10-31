@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../common/decorators';
 import { CodigosService } from './codigos.service';
 
 @Controller('formato/codigos')

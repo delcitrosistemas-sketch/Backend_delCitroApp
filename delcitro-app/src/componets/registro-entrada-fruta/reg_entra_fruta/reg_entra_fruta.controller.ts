@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { RegEntraFrutaService } from './reg_entra_fruta.service';
 import { CreateRegistroDto } from 'src/componets/models/index.model';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../../common/decorators';
 
 @Controller('reg-entra-fruta')
 export class RegEntraFrutaController {

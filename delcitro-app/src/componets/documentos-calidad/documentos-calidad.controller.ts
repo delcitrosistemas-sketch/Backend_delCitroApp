@@ -16,7 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { DocumentosCalidadService } from './documentos-calidad.service';
 import { extname } from 'path';
-import { Public } from 'src/common/decorators';
+import { Public } from '../../common/decorators';
 
 @Controller('doc-sgc')
 export class DocumentosCalidadController {

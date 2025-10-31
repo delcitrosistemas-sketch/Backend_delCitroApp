@@ -10,11 +10,11 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { GetCurrentUser, GetCurrentUserId, Public } from 'src/common/decorators';
+import { GetCurrentUser, GetCurrentUserId, Public } from '../common/decorators';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 import { Tokens } from './types';
-import { RtGuad } from 'src/common/guards';
+import { RtGuad } from '../common/guards';
 import type { Response, Request } from 'express';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
