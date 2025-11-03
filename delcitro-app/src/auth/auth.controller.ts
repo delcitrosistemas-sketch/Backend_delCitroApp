@@ -61,19 +61,7 @@ export class AuthController {
   @Post('/local/signIn')
   @HttpCode(HttpStatus.OK)
   async signInLocal(@Body() dto: AuthDto, @Req() req: Request) {
-    console.log('Iniciando sesión para:', dto.usuario);
-
-    const user = await this.prisma.uSUARIOS.findUnique({
-      where: { usuario: dto.usuario },
-    });
-
-    if (!user) throw new UnauthorizedException('Usuario no encontrado');
-
-    const passwordMatches = await bcrypt.compare(dto.password, user.hash);
-    if (!passwordMatches) throw new ForbiddenException('Credenciales inválidas');
-
     const tokens = await this.authService.signinLocal(dto);
-    await this.authService.updateRtHash(user.id, tokens.refresh_token);
 
     return {
       access_token: tokens.access_token,
