@@ -39,6 +39,10 @@ class CreateVerificacionDetergenteDto {
   @IsOptional()
   @IsString()
   resp_dilucion?: string;
+
+  @IsOptional()
+  @IsNumber()
+  num_orden?: number;
 }
 
 class UpdateVerificacionDetergenteDto {
@@ -79,6 +83,10 @@ class UpdateVerificacionDetergenteDto {
   @IsOptional()
   @IsString()
   resp_dilucion?: string;
+
+  @IsOptional()
+  @IsNumber()
+  num_orden?: number;
 }
 
 export { CreateVerificacionDetergenteDto, UpdateVerificacionDetergenteDto };

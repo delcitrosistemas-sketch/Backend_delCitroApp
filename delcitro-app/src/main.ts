@@ -47,7 +47,7 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
 
   await app.listen(port, '0.0.0.0');
-  console.log(`ervidor ejecutándose en puerto ${port}`);
+  console.log(`Servidor ejecutándose en puerto ${port}`);
   console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`);
 }
 

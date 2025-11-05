@@ -24,7 +24,6 @@ export class DescargaController {
   @Post('/crear')
   @HttpCode(HttpStatus.CREATED)
   create(@Body() data: CreateDescargaFrutaDto) {
-    console.log(JSON.stringify(data));
     return this.descargaFrutaService.create(data);
   }
 

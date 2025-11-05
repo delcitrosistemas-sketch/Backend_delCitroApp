@@ -43,6 +43,10 @@ class CreateDescargaFrutaDto {
   @IsOptional()
   @IsNumber()
   cant_real_desca?: number;
+
+  @IsOptional()
+  @IsString()
+  observaciones?: string;
 }
 
 class UpdateDescargaFrutaDto {
@@ -92,6 +96,10 @@ class UpdateDescargaFrutaDto {
   @IsOptional()
   @IsNumber()
   num_orden?: number;
+
+  @IsOptional()
+  @IsString()
+  observaciones?: string;
 }
 
 export { CreateDescargaFrutaDto, UpdateDescargaFrutaDto };

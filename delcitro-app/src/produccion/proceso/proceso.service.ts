@@ -42,7 +42,7 @@ export class ProcesoService {
             destino: data.destino,
             lote_asignado: data.lote_asignado,
             status: 'En_Proceso',
-            fecha: new Date(),
+            fecha: data.fecha,
           },
         });
 

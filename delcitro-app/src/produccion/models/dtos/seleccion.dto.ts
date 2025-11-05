@@ -1,11 +1,10 @@
-import { IsString, IsEnum, IsOptional, IsDate, IsNumber, IsInt } from 'class-validator';
+import { IsString, IsEnum, IsOptional, IsDate, IsNumber, IsInt, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { TipoProceso } from '.prisma/client';
 
 class CreateReporteMermaDto {
   @IsString()
   id_proceso: string;
-
 
   @IsOptional()
   @Type(() => Date)
@@ -47,6 +46,11 @@ class CreateReporteMermaDto {
 
   @IsNumber()
   peso_neto: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  turno?: number;
 
   @IsOptional()
   @IsString()

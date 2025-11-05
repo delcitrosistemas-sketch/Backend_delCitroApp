@@ -3,6 +3,9 @@ import { TipoProceso } from '.prisma/client';
 import { Type } from 'class-transformer';
 
 class CreateRegistroProcesoDto {
+  @IsString()
+  id_proceso?: string;
+
   @IsEnum(TipoProceso)
   tipo_proceso: TipoProceso;
 
