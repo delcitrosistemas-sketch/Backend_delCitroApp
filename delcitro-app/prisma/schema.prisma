@@ -54,7 +54,8 @@ model REGISTRO_PROCESO {
 model REGISTRO_DESCARGA_FRUTA {
   id                               Int              @id @default(autoincrement())
   id_proceso                      String
-  folio_fruta                     String           
+  folio_fruta                     String
+  boleta                          String?           
   fecha                           DateTime         @default(now())
   placas_transporte               String
   variedad                        String

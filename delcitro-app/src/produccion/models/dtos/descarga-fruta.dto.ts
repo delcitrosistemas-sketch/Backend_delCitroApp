@@ -10,6 +10,10 @@ class CreateDescargaFrutaDto {
   folio_fruta: string;
 
   @IsOptional()
+  @IsString()
+  boleta?: string;
+
+  @IsOptional()
   @Type(() => Date)
   @IsDate()
   fecha?: Date;
