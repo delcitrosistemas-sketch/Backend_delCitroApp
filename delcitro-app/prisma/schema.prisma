@@ -25,6 +25,8 @@ enum Status_Proceso {
   Rechazado
 }
 
+
+// ======== AREA DE PROCESO ========
 // Tabla principal que centraliza todo el proceso
 model REGISTRO_PROCESO {
   id                              Int              @id @default(autoincrement())
@@ -55,7 +57,6 @@ model REGISTRO_DESCARGA_FRUTA {
   id                               Int              @id @default(autoincrement())
   id_proceso                      String
   folio_fruta                     String
-  boleta                          String?           
   fecha                           DateTime         @default(now())
   placas_transporte               String
   variedad                        String
@@ -67,14 +68,10 @@ model REGISTRO_DESCARGA_FRUTA {
   cant_real_desca                 Float?
   num_orden                       Int?
   observaciones                   String?
-  proveedor_id                    Int?
-  detalles_id                     Int?
   createdAt                       DateTime         @default(now())
   updatedAt                       DateTime         @updatedAt
 
   proceso                         REGISTRO_PROCESO                @relation(fields: [id_proceso], references: [id_proceso], onDelete: Cascade)
-  proveedor                       PROVEEDORES?                     @relation(fields: [proveedor_id], references: [id])
-  detalles                        DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO?     @relation(fields: [detalles_id], references: [id])
 
   @@map("REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
 }
@@ -251,24 +248,6 @@ model REVISION_TRANSPORTE {
   @@map("REVISION_TRANSPORTE_SALIDA_TRANSPORTE_PIPA_TERMO")
 }
 
-model DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO {
-    id                              Int             @id @default(autoincrement())
-    bins                            Int?
-    jaula                           String?
-    estado                          String?
-    municipio                       String?
-    huerta                          String? 
-    observaciones                   String?
-    muestra_id                      Int?   
-    createdAt                       DateTime        @default(now())
-    updatedAt                       DateTime        @default(now()) 
-
-    muestreo                MUESTREOS? @relation(fields: [muestra_id], references: [id])
-    registro_fruta          REGISTRO_DESCARGA_FRUTA[]   
-
-    @@map("DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO")
-}
-
 
 model MUESTREOS {
     id                      Int                 @id @default(autoincrement())
@@ -291,7 +270,7 @@ model MUESTREOS {
     createdAt               DateTime            @default(now())
     updatedAt               DateTime            @default(now())
 
-    registro            DETALLES_REGISTRO_DESCARGA_FRUTA_PARA_PROCESO[]   
+    registro            DETALLES_REGISTRO_ENTRADA_FRUTA[]   
 
     @@map("MUESTREOS")
 }
@@ -300,7 +279,7 @@ model REGISTRO_SALIDA_PRODUCTO_TERMINADO {
     id                  Int             @id @default(autoincrement())
     proceso_id          Int
     tipo                String
-    cliente_id             Int
+    cliente_id          Int
     fecha_envasado      DateTime
     lote                String
     embalaje            String
@@ -320,6 +299,53 @@ model REGISTRO_SALIDA_PRODUCTO_TERMINADO {
 
     @@map("REGISTRO_SALIDA_PRODUCTO_TERMINADO")
 
+}
+
+
+// ======== AREA DE BÁSCULA ========
+// Registro de entrada de fruta 
+
+model REGISTRO_ENTRADA_FRUTA {
+    id                              Int             @id @default(autoincrement())
+    folio                           String             @unique
+    fecha                           DateTime
+    boleta                          String
+    placas_transporte               String
+    chofer                          String?
+    variedad                        String
+    destino                         String
+    inicio_descarga                 DateTime?
+    fin_descarga                    DateTime?
+    cant_progra_desca               Float?
+    cant_real_desca                 Float?
+    proveedor_id                    Int
+    detalles_id                     Int?
+    createdAt                       DateTime        @default(now())
+    updatedAt                       DateTime        @default(now()) 
+
+    proveedor       PROVEEDORES     @relation(fields: [proveedor_id], references: [id])
+    detalles        DETALLES_REGISTRO_ENTRADA_FRUTA?     @relation(fields: [detalles_id], references: [id])
+
+    @@map("REGISTRO_ENTRADA_FRUTA")
+
+}
+
+model DETALLES_REGISTRO_ENTRADA_FRUTA {
+    id                              Int             @id @default(autoincrement())
+    bins                            Int?
+    jaula                           String?
+    estado                          String?
+    municipio                       String?
+    huerta                          String? 
+    observaciones                   String?
+    muestra_id                      Int?   
+    createdAt                       DateTime        @default(now())
+    updatedAt                       DateTime        @default(now()) 
+
+    muestreo                MUESTREOS? @relation(fields: [muestra_id], references: [id])
+    registro_entrada        REGISTRO_ENTRADA_FRUTA[]
+
+    @@map("DETALLES_REGISTRO_ENTRADA_FRUTA")
 }
 
 
@@ -389,7 +415,7 @@ model PROVEEDORES {
     createdAt               DateTime        @default(now())
     updatedAt               DateTime        @default(now())
 
-    reg_entrada_fruta       REGISTRO_DESCARGA_FRUTA[]
+    reg_entrada_fruta       REGISTRO_ENTRADA_FRUTA[]
 
     @@map("PROVEEDORES")
 }

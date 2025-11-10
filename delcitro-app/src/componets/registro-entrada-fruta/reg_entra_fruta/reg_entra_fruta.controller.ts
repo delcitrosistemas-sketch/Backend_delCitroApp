@@ -11,7 +11,10 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { RegEntraFrutaService } from './reg_entra_fruta.service';
-import { CreateRegistroDto } from '../../../componets/models/index.model';
+import {
+  CreateRegistroEntradaFrutaDto,
+  UpdateRegistroEntradaFrutaDto,
+} from '../../models/dtos/RegEntradaFruta.model';
 import { Public } from '../../../common/decorators';
 
 @Controller('reg-entra-fruta')
@@ -33,12 +36,12 @@ export class RegEntraFrutaController {
   @Public()
   @Post('/create')
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() registro: CreateRegistroDto) {
-    return this.service.create(registro);
+  async create(@Body() data: CreateRegistroEntradaFrutaDto) {
+    return this.service.create(data);
   }
 
   @Put('/editar/:id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateRegistroEntradaFrutaDto) {
     return this.service.update(id, data);
   }
 

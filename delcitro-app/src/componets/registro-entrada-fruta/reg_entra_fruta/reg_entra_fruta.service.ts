@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { format } from 'date-fns'; // Cambia esta importación
-import { es } from 'date-fns/locale';
-import { CreateRegistroDto, UpdateRegistroDto } from '../../../componets/models/index.model';
+import {
+  CreateRegistroEntradaFrutaDto,
+  UpdateRegistroEntradaFrutaDto,
+} from '../../../componets/models/dtos/RegEntradaFruta.model';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { FoliosService } from '../../../shared/folios/folios.service';
 
@@ -12,110 +13,149 @@ export class RegEntraFrutaService {
     private folioService: FoliosService,
   ) {}
 
-  async create(data: CreateRegistroDto) {
-    const folio = await this.folioService.generarFolioRecepcionFruta('Mandarina');
+  async create(createRegistroEntradaFrutaDto: CreateRegistroEntradaFrutaDto) {
+    const { detalles, proveedor_id, ...registroData } = createRegistroEntradaFrutaDto;
 
-    const createData: any = {
-      id_proceso: '',
-      folio_fruta: folio,
-      fecha: new Date(data.fecha),
-      placas_transporte: data.placas_transporte,
-      variedad: data.variedad,
-      destino: data.destino,
-      inicio_descarga: data.inicio_descarga ? new Date(data.inicio_descarga) : null,
-      fin_descarga: data.fin_descarga ? new Date(data.fin_descarga) : null,
-      cant_progra_desca: data.cant_progra_desca,
-      cant_real_desca: data.cant_real_desca,
-      createdAt: new Date(data.fecha),
-      updatedAt: new Date(data.fecha),
+    const data: any = {
+      ...registroData,
+      proveedor: {
+        connect: { id: proveedor_id },
+      },
     };
 
-    if (data.proveedor_id) {
-      createData.proveedor = {
-        connect: { id: data.proveedor_id },
-      };
-    }
+    if (detalles) {
+      const { muestra_id, ...detallesData } = detalles;
 
-    if (data.detalles) {
-      createData.detalles = {
+      data.detalles = {
         create: {
-          bins: data.detalles?.bins ?? null,
-          jaula: data.detalles?.jaula ?? null,
-          estado: data.detalles?.estado ?? null,
-          municipio: data.detalles?.municipio ?? null,
-          huerta: data.detalles?.huerta ?? null,
-          observaciones: data.detalles?.observaciones ?? null,
-          muestra_id: data.detalles?.muestra_id ?? null,
+          ...detallesData,
+          ...(muestra_id && {
+            muestreo: {
+              connect: { id: muestra_id },
+            },
+          }),
         },
       };
     }
 
-    return this.prisma.rEGISTRO_DESCARGA_FRUTA.create({
-      data: createData,
+    return await this.prisma.rEGISTRO_ENTRADA_FRUTA.create({
+      data,
       include: {
         proveedor: true,
-        detalles: { include: { muestreo: true } },
+        detalles: {
+          include: {
+            muestreo: true,
+          },
+        },
       },
     });
   }
 
   async findAll() {
-    const registros = await this.prisma.rEGISTRO_DESCARGA_FRUTA.findMany({
+    return await this.prisma.rEGISTRO_ENTRADA_FRUTA.findMany({
       include: {
         proveedor: true,
-        detalles: { include: { muestreo: true } },
+        detalles: {
+          include: {
+            muestreo: true,
+          },
+        },
       },
-      orderBy: { fecha: 'desc' },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
-
-    return registros.map((r) => ({
-      ...r,
-      fecha: format(new Date(r.fecha), 'dd/MM/yyyy', { locale: es }),
-      inicio_descarga: r.inicio_descarga
-        ? format(new Date(r.inicio_descarga), 'dd/MM/yyyy HH:mm', { locale: es })
-        : null,
-      fin_descarga: r.fin_descarga
-        ? format(new Date(r.fin_descarga), 'dd/MM/yyyy HH:mm', { locale: es })
-        : null,
-      createdAt: format(new Date(r.createdAt), 'dd/MM/yyyy HH:mm', { locale: es }),
-      updatedAt: format(new Date(r.updatedAt), 'dd/MM/yyyy HH:mm', { locale: es }),
-    }));
   }
 
   async findOne(id: number) {
-    const registro = await this.prisma.rEGISTRO_DESCARGA_FRUTA.findUnique({
+    const registro = await this.prisma.rEGISTRO_ENTRADA_FRUTA.findUnique({
       where: { id },
       include: {
         proveedor: true,
-        detalles: { include: { muestreo: true } },
+        detalles: {
+          include: {
+            muestreo: true,
+          },
+        },
       },
     });
 
-    if (!registro) throw new NotFoundException('Registro no encontrado');
+    if (!registro) {
+      throw new NotFoundException(`Registro con ID ${id} no encontrado`);
+    }
 
-    return {
-      ...registro,
-      fecha: format(new Date(registro.fecha), 'dd/MM/yyyy', { locale: es }),
-      inicio_descarga: registro.inicio_descarga
-        ? format(new Date(registro.inicio_descarga), 'dd/MM/yyyy HH:mm', { locale: es })
-        : null,
-      fin_descarga: registro.fin_descarga
-        ? format(new Date(registro.fin_descarga), 'dd/MM/yyyy HH:mm', { locale: es })
-        : null,
-      createdAt: format(new Date(registro.createdAt), 'dd/MM/yyyy HH:mm', { locale: es }),
-      updatedAt: format(new Date(registro.updatedAt), 'dd/MM/yyyy HH:mm', { locale: es }),
-    };
+    return registro;
   }
 
-  async update(id: number, data: UpdateRegistroDto) {
+  async findByFolio(folio: string) {
+    const registro = await this.prisma.rEGISTRO_ENTRADA_FRUTA.findUnique({
+      where: { folio },
+      include: {
+        proveedor: true,
+        detalles: {
+          include: {
+            muestreo: true,
+          },
+        },
+      },
+    });
+
+    if (!registro) {
+      throw new NotFoundException(`Registro con folio ${folio} no encontrado`);
+    }
+
+    return registro;
+  }
+
+  async update(id: number, updateRegistroEntradaFrutaDto: UpdateRegistroEntradaFrutaDto) {
+    const { detalles, proveedor_id, ...registroData } = updateRegistroEntradaFrutaDto;
+
     await this.findOne(id);
 
-    return this.prisma.rEGISTRO_DESCARGA_FRUTA.update({
+    const data: any = { ...registroData };
+
+    if (proveedor_id !== undefined) {
+      data.proveedor = {
+        connect: { id: proveedor_id },
+      };
+    }
+
+    if (detalles) {
+      const existingRegistro = await this.prisma.rEGISTRO_ENTRADA_FRUTA.findUnique({
+        where: { id },
+        include: { detalles: true }
+      });
+
+      const { muestra_id, ...detallesData } = detalles;
+      const detallesUpdateData: any = { ...detallesData };
+
+      if (muestra_id !== undefined) {
+        detallesUpdateData.muestreo = {
+          connect: { id: muestra_id },
+        };
+      }
+
+      if (existingRegistro?.detalles) {
+        data.detalles = {
+          update: detallesUpdateData
+        };
+      } else {
+        data.detalles = {
+          create: detallesUpdateData
+        };
+      }
+    }
+
+    return await this.prisma.rEGISTRO_ENTRADA_FRUTA.update({
       where: { id },
       data,
       include: {
         proveedor: true,
-        detalles: { include: { muestreo: true } },
+        detalles: {
+          include: {
+            muestreo: true,
+          },
+        },
       },
     });
   }
@@ -123,7 +163,18 @@ export class RegEntraFrutaService {
   async remove(id: number) {
     await this.findOne(id);
 
-    return this.prisma.rEGISTRO_DESCARGA_FRUTA.delete({
+    const registro = await this.prisma.rEGISTRO_ENTRADA_FRUTA.findUnique({
+      where: { id },
+      include: { detalles: true },
+    });
+
+    if (registro?.detalles) {
+      await this.prisma.dETALLES_REGISTRO_ENTRADA_FRUTA.delete({
+        where: { id: registro.detalles.id },
+      });
+    }
+
+    return await this.prisma.rEGISTRO_ENTRADA_FRUTA.delete({
       where: { id },
     });
   }
