@@ -20,6 +20,10 @@ import { DescargaService } from './descarga.service';
 @Controller('proceso/descarga')
 export class DescargaController {
   constructor(private descargaFrutaService: DescargaService) {}
+  @Get('/obtenerTodos')
+  findAll() {
+    return this.descargaFrutaService.findAll();
+  }
 
   @Post('/crear')
   @HttpCode(HttpStatus.CREATED)
@@ -29,13 +33,7 @@ export class DescargaController {
 
   @Get('/:id_proceso')
   findByIdProceso(@Param('id_proceso') id_proceso: string) {
-    console.log('Buscando descarga para proceso:', id_proceso);
     return this.descargaFrutaService.findByIdProceso(id_proceso);
-  }
-
-  @Get('/obtenerTodos')
-  findAll() {
-    return this.descargaFrutaService.findAll();
   }
 
   @Get('/calcular-tiempo-descarga/:id_proceso')
@@ -75,6 +73,7 @@ export class DescargaController {
 
   @Patch('/actualizar/:id_proceso')
   updateByIdProceso(@Param('id_proceso') id_proceso: string, @Body() data: UpdateDescargaFrutaDto) {
+    console.log('===============================>');
     return this.descargaFrutaService.updateByIdProceso(id_proceso, data);
   }
 
