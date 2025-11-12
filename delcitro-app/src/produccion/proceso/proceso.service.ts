@@ -208,6 +208,46 @@ export class ProcesoService {
     }
   }
 
+  async editStatusProceso(id_proceso: string, status: string) {
+    try {
+      await this.findByIdProceso(id_proceso);
+
+      let statusEnum: any;
+
+      switch (status.toUpperCase()) {
+        case 'COMPLETADO':
+          statusEnum = 'Completado';
+          break;
+        case 'EN_PROCESO':
+        case 'EN PROCESO':
+          statusEnum = 'En_Proceso';
+          break;
+        case 'RECHAZADO':
+          statusEnum = 'Rechazado';
+          break;
+        case 'PENDIENTE':
+          statusEnum = 'Pendiente';
+          break;
+        default:
+          throw new Error(
+            `Status '${status}' no es válido. Valores permitidos: Completado, En_Proceso, Rechazado, Pendiente`,
+          );
+      }
+
+      return await this.prisma.rEGISTRO_PROCESO.update({
+        where: { id_proceso },
+        data: {
+          status: statusEnum,
+        },
+      });
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new Error(`Error al actualizar el proceso: ${error.message}`);
+    }
+  }
+
   async remove(id: number) {
     try {
       await this.findOne(id);

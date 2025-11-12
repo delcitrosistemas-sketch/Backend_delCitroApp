@@ -74,6 +74,11 @@ export class ProcesoController {
     return this.registroProcesoService.findOne(id);
   }
 
+  @Patch('/editar/:status/:id_proceso')
+  completeProceso(@Param('id_proceso') id_proceso: string, @Param('status') status: string) {
+    return this.registroProcesoService.editStatusProceso(id_proceso, status);
+  }
+
   @Patch('/editar/:id_proceso')
   updateByIdProceso(
     @Param('id_proceso') id_proceso: string,
