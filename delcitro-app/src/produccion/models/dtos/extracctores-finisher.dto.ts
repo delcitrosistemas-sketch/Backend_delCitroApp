@@ -69,6 +69,10 @@ class UpdateExtractoresFinisherDto {
   @IsOptional()
   tipo_proceso?: TipoProceso;
 
+  @IsOptional()
+  @IsString()
+  folio_fruta: string;
+
   @IsInt()
   @IsOptional()
   num_extractor?: number;
