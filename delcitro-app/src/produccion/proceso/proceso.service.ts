@@ -198,7 +198,10 @@ export class ProcesoService {
 
       return await this.prisma.rEGISTRO_PROCESO.update({
         where: { id_proceso },
-        data: data,
+        data: {
+          ...data,
+          updatedAt: new Date(),
+        },
       });
     } catch (error) {
       if (error instanceof NotFoundException) {
