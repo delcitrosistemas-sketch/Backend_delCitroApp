@@ -59,16 +59,29 @@ class CreateReporteMermaDto {
 
 class UpdateReporteMermaDto {
   @IsOptional()
-  @IsString()
-  folio_fruta?: string;
+  @Type(() => Date)
+  @IsDate()
+  fecha: Date;
 
   @IsOptional()
   @IsInt()
   num_orden?: number;
 
   @IsOptional()
+  @IsEnum(TipoProceso)
+  tipo_proceso: TipoProceso;
+
+  @IsOptional()
   @IsString()
   area?: string;
+
+  @IsOptional()
+  @IsString()
+  variedad?: string;
+
+  @IsNumber()
+  @IsOptional()
+  turno: number;
 
   @IsOptional()
   @Type(() => Date)

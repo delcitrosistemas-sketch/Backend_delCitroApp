@@ -66,7 +66,12 @@ export class LavadoController {
     return this.lavadoService.findByTipoProceso(tipo_proceso);
   }
 
-  @Patch('/actualizar/:id_proceso')
+  @Patch('/actualizar/:id')
+  updateById(@Param('id') id: number, @Body() data: UpdateVerificacionDetergenteDto) {
+    return this.lavadoService.update(id, data);
+  }
+
+  @Patch('/actualizar/id_proceso/:id_proceso')
   updateByIdProceso(
     @Param('id_proceso') id_proceso: string,
     @Body() data: UpdateVerificacionDetergenteDto,
@@ -74,7 +79,13 @@ export class LavadoController {
     return this.lavadoService.updateByIdProceso(id_proceso, data);
   }
 
-  @Delete('/eliminar/:id_proceso')
+  @Delete('/eliminar/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeById(@Param('id') id: number) {
+    return this.lavadoService.remove(id);
+  }
+
+  @Delete('/eliminar/id_proceso/:id_proceso')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeByIdProceso(@Param('id_proceso') id_proceso: string) {
     return this.lavadoService.removeByIdProceso(id_proceso);

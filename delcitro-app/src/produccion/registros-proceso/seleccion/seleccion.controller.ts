@@ -52,18 +52,23 @@ export class SeleccionController {
     return this.seleccionService.findByVariedad(variedad);
   }
 
+  @Patch('/actualizar/:id')
+  updateById(@Param('id') id: number, @Body() data: UpdateReporteMermaDto) {
+    return this.seleccionService.update(id, data);
+  }
+
   @Patch('/actualizar/:id_proceso')
   updateByIdProceso(@Param('id_proceso') id_proceso: string, @Body() data: UpdateReporteMermaDto) {
     return this.seleccionService.updateByIdProceso(id_proceso, data);
   }
 
-  @Delete('/eliminar/:id_proceso')
+  @Delete('/eliminar/id_proceso/:id_proceso')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeByIdProceso(@Param('id_proceso') id_proceso: string) {
     return this.seleccionService.removeByIdProceso(id_proceso);
   }
 
-  @Delete('/:id')
+  @Delete('/eliminar/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.seleccionService.remove(id);
