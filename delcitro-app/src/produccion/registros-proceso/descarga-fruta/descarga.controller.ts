@@ -73,7 +73,6 @@ export class DescargaController {
 
   @Patch('/actualizar/:id_proceso')
   updateByIdProceso(@Param('id_proceso') id_proceso: string, @Body() data: UpdateDescargaFrutaDto) {
-    console.log('===============================>');
     return this.descargaFrutaService.updateByIdProceso(id_proceso, data);
   }
 

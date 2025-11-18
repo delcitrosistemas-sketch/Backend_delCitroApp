@@ -2,12 +2,6 @@ import { IsString, IsOptional, IsDate, IsEnum, IsInt, ValidateNested } from 'cla
 import { Type } from 'class-transformer';
 import { RESPUESTA_FORMULARIOS } from '.prisma/client';
 
-export enum RespuestaFormularios {
-  SI = 'SI',
-  NO = 'NO',
-  NA = 'NA',
-}
-
 // DTOs para las revisiones (sin registro_salida_id)
 class RevisionDocumentacionDto {
   @IsEnum(RESPUESTA_FORMULARIOS)

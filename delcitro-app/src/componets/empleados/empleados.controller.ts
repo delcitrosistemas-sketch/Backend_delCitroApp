@@ -23,7 +23,6 @@ export class EmpleadosController {
   @Post('/crear-empleado')
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() data: Prisma.EMPLEADOSCreateInput) {
-    console.log(data);
     return this.empleadoService.create(data);
   }
 
@@ -38,7 +37,6 @@ export class EmpleadosController {
   @Get('/find/:id')
   @HttpCode(HttpStatus.OK)
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    console.log('Entrando a empleado por id');
     return this.empleadoService.findOne(id);
   }
 
@@ -46,7 +44,6 @@ export class EmpleadosController {
   @Put('/editar/:id')
   @HttpCode(HttpStatus.OK)
   async update(@Param('id', ParseIntPipe) id: number, @Body() data: any) {
-    console.log(' 000000000000 ' + JSON.stringify(data));
     return this.empleadoService.update(id, data);
   }
 

@@ -27,8 +27,6 @@ export class CargaProductoTerminadoService {
         where: { id_proceso: data.id_proceso },
       });
 
-      console.log(JSON.stringify(data.id_proceso));
-
       if (!procesoExiste) {
         throw new NotFoundException(`El proceso con id_proceso ${data.id_proceso} no existe`);
       }
@@ -155,9 +153,7 @@ export class CargaProductoTerminadoService {
 
       const { revision_documentacion, revision_transporte, ...updateData } = baseData;
 
-      // Usar transacción para actualizar el registro principal y las relaciones
       return await this.prisma.$transaction(async (tx) => {
-        // 1. Actualizar el registro principal
         const registroActualizado = await tx.rEGISTRO_SALIDA_TRANSPORTE.update({
           where: { id },
           data: updateData,
@@ -174,7 +170,6 @@ export class CargaProductoTerminadoService {
               data: revision_documentacion,
             });
           } else {
-            // Crear nueva revisión
             await tx.rEVISION_DOCUMENTACION.create({
               data: {
                 registro_salida_id: id,
@@ -195,7 +190,6 @@ export class CargaProductoTerminadoService {
               data: revision_transporte,
             });
           } else {
-            // Crear nueva revisión
             await tx.rEVISION_TRANSPORTE.create({
               data: {
                 registro_salida_id: id,
@@ -205,7 +199,6 @@ export class CargaProductoTerminadoService {
           }
         }
 
-        // 4. Retornar el registro completo con las relaciones actualizadas
         return await tx.rEGISTRO_SALIDA_TRANSPORTE.findUnique({
           where: { id },
           include: {

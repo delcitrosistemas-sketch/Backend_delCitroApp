@@ -78,7 +78,6 @@ export class UsuariosService {
   }
 
   async infoUserProfileById(userId: number) {
-    console.log('Service perfil');
     const user = await this.prisma.uSUARIOS.findUnique({
       where: { id: userId },
       select: { id: true, usuario: true, rol: true, avatar: true },
