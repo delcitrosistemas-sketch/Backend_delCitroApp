@@ -1,5 +1,5 @@
 import { ROLES_AREA } from '@prisma/client';
-import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsInt, IsNotEmpty, IsString, Min, MinLength } from 'class-validator';
 
 export class AuthDto {
   @IsNotEmpty()
@@ -24,4 +24,14 @@ export class AssignAreaDto {
 export interface AssignPermissionDto {
   areaId: number;
   rolArea: 'ADMINISTRADOR_AREA' | 'SUPERVISOR_AREA' | 'OPERADOR' | 'VISUALIZADOR';
+}
+
+export class AdminChangePasswordDto {
+  @IsInt()
+  @Min(1)
+  userId: number;
+
+  @IsString()
+  @MinLength(5)
+  newPassword: string;
 }

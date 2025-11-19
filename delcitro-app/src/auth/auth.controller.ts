@@ -1,23 +1,11 @@
-import {
-  Body,
-  Controller,
-  ForbiddenException,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { GetCurrentUser, GetCurrentUserId, Public } from '../common/decorators';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto';
+import { AdminChangePasswordDto, AuthDto } from './dto';
 import { Tokens } from './types';
 import { RtGuad } from '../common/guards';
 import type { Response, Request } from 'express';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
@@ -70,5 +58,14 @@ export class AuthController {
       expires_in: 60 * 60,
       message: 'Login exitoso',
     };
+  }
+
+  @Post('/admin-change')
+  @HttpCode(HttpStatus.OK)
+  async adminChangePassword(
+    @GetCurrentUserId() adminUserId: number,
+    @Body() dto: AdminChangePasswordDto,
+  ) {
+    return this.authService.adminChangePassword(adminUserId, dto);
   }
 }

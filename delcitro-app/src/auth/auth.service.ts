@@ -1,5 +1,10 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-import { AuthDto } from './dto';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { AdminChangePasswordDto, AuthDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { Tokens } from './types';
@@ -54,15 +59,29 @@ export class AuthService {
       },
     });
 
-    if (!user) throw new ForbiddenException('Access Denied');
+    console.log('2. Usuario encontrado:', user);
+
+    if (!user) {
+      console.log('3. Usuario no existe:', dto.usuario);
+      throw new ForbiddenException('Usuario o contraseña incorrectos');
+    }
 
     const passwordMatches = await bcrypt.compare(dto.password, user.hash);
-    if (!passwordMatches) throw new ForbiddenException('Access Denied');
+    console.log('4. Coincidencia de contraseña:', passwordMatches);
 
+    if (!passwordMatches) {
+      console.log('5. Contraseña incorrecta para usuario:', dto.usuario);
+      throw new ForbiddenException('Usuario o contraseña incorrectos');
+    }
+
+    console.log('6. Permisos del usuario:', user.permisos);
     const userPermissions = await this.getUserPermissions(user);
 
     const tokens = await this.getTokens(user.id, user.usuario, userPermissions);
     await this.updateRtHash(user.id, tokens.refresh_token);
+
+    console.log('7. Login exitoso para:', dto.usuario);
+
     return tokens;
   }
 
@@ -162,5 +181,43 @@ export class AuthService {
       access_token: at,
       refresh_token: rt,
     };
+  }
+
+  async adminChangePassword(
+    adminUserId: number,
+    dto: AdminChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const adminUser = await this.prisma.uSUARIOS.findUnique({
+      where: { id: adminUserId },
+    });
+
+    if (!adminUser) {
+      throw new NotFoundException('Usuario administrador no encontrado');
+    }
+
+    if (dto.newPassword.length < 4) {
+      throw new BadRequestException('La nueva contraseña debe tener al menos 5 caracteres');
+    }
+
+    const targetUser = await this.prisma.uSUARIOS.findUnique({
+      where: { id: dto.userId },
+    });
+
+    if (!targetUser) {
+      throw new NotFoundException('Usuario objetivo no encontrado');
+    }
+
+    const newHash = await this.hashData(dto.newPassword);
+
+    await this.prisma.uSUARIOS.update({
+      where: { id: dto.userId },
+      data: {
+        hash: newHash,
+        hashedRt: null,
+        updatedAt: new Date(),
+      },
+    });
+
+    return { message: `Contraseña actualizada exitosamente para el usuario ${targetUser.usuario}` };
   }
 }
