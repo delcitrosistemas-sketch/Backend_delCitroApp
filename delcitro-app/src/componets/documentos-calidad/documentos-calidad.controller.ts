@@ -34,6 +34,32 @@ export class DocumentosCalidadController {
     };
   }
 
+  @Post('/create')
+  async createDocument(
+    @Body()
+    data: {
+      titulo: string;
+      tipo: string;
+      descripcion?: string;
+      url: string;
+      public_id: string;
+    }
+  ) {
+    const fileName = data.url.split('/').pop() || 'documento';
+    const fileExtension = fileName.split('.').pop() || 'pdf';
+
+    return this.service.create({
+      tipo: data.tipo,
+      archivo: fileName,
+      nombre: data.titulo,
+      titulo: data.titulo,
+      descripcion: data.descripcion || null,
+      archivoUrl: data.url,
+      extension: fileExtension,
+      cloudinary_id: data.public_id,
+    });
+  }
+
   @Public()
   @Get('/find-All')
   async findAll() {

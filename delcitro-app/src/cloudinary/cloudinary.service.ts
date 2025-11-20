@@ -50,7 +50,9 @@ export class CloudinaryService {
       const upload = cloudinary.uploader.upload_stream(
         {
           folder: 'documentos',
-          resource_type: 'raw',
+          resource_type: 'image',
+          format: this.getFileFormat(file.originalname),
+          type: 'upload',
         },
         (error, result) => {
           if (error) return reject(error);
@@ -59,5 +61,20 @@ export class CloudinaryService {
       );
       toStream(file.buffer).pipe(upload);
     });
+  }
+
+  private getFileFormat(filename: string): string {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    const formatMap: { [key: string]: string } = {
+      'pdf': 'pdf',
+      'doc': 'doc',
+      'docx': 'docx',
+      'xls': 'xls',
+      'xlsx': 'xlsx',
+      'ppt': 'ppt',
+      'pptx': 'pptx',
+      'txt': 'txt'
+    };
+    return formatMap[ext] || 'auto';
   }
 }
