@@ -9,20 +9,38 @@ export class EmpleadosService {
 
   private areaMap: Record<string, number> = {
     "Producción": 1,
-    "Ventas": 2,
-    "Logística": 3,
-    "Tecnología": 4,
-    "Marketing": 5,
-    "Transporte": 6,
+    "Calidad": 2,
+    "Almacén": 3,
+    "Administración": 4,
+    "Recursos Humanos": 5,
+    "Ventas": 6,
+    "Compras": 7,
+    "Laboratorio": 8,
+    "Envasado": 9,
+    "Sistemas": 10,
+    "Logística": 11,
+    "Tecnología": 12,
+    "Marketing": 13,
+    "Transporte": 14,
+
   };
 
   private departamentoMap: Record<string, number> = {
     "Mantenimiento": 1,
-    "Recursos Humanos": 2,
-    "Calidad": 3,
-    "Sistemas": 4,
-    "Finanzas": 5,
-    "Mejora Continua": 6,
+    "Control de Calidad": 2,
+    "Inventario": 3,
+    "Finanzas": 4,
+    "Recursos Humanos": 5,
+    "Mantenimiento": 6,
+    "Tecnología": 7,
+    "Envasado": 8,
+    "Mejora Continua": 9,
+    "Entrada de Fruta para Proceso": 10,
+    "Selección y Lavado": 11,
+    "Extracción": 12,
+    "Refrigeración": 13,
+    "Salida de Producto Terminado": 14,
+    "Análisis y Muestreos": 15,
   };
 
   private puestoMap: Record<string, number> = {
