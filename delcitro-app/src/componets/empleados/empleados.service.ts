@@ -26,7 +26,7 @@ export class EmpleadosService {
   };
 
   private departamentoMap: Record<string, number> = {
-    "Mantenimiento": 1,
+    "Proceso": 1,
     "Control de Calidad": 2,
     "Inventario": 3,
     "Finanzas": 4,
