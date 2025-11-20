@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AtGuard } from './common/guards';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
+import { config } from 'dotenv';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -54,4 +55,12 @@ async function bootstrap() {
 bootstrap().catch((error) => {
   console.error('Error al iniciar la aplicación:', error);
   process.exit(1);
+});
+
+config(); // Esto carga las variables del .env
+
+console.log('Cloudinary Config Check:', {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET ? '***SET***' : 'MISSING',
 });

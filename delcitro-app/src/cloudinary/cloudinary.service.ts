@@ -21,8 +21,37 @@ export class CloudinaryService {
 
   async uploadStream(file: Express.Multer.File): Promise<any> {
     return new Promise((resolve, reject) => {
+      const resourceType = this.getResourceType(file.mimetype);
+
       const upload = cloudinary.uploader.upload_stream(
-        { folder: 'documentos' },
+        {
+          folder: 'documentos',
+          resource_type: resourceType, // ¡IMPORTANTE!
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        },
+      );
+      toStream(file.buffer).pipe(upload);
+    });
+  }
+
+  private getResourceType(mimetype: string): 'auto' | 'image' | 'video' | 'raw' {
+    if (mimetype.startsWith('image/')) return 'image';
+    if (mimetype.startsWith('video/')) return 'video';
+    if (mimetype.includes('pdf') || mimetype.includes('document') || mimetype.includes('text'))
+      return 'raw';
+    return 'auto';
+  }
+
+  async uploadDocument(file: Express.Multer.File): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const upload = cloudinary.uploader.upload_stream(
+        {
+          folder: 'documentos',
+          resource_type: 'raw',
+        },
         (error, result) => {
           if (error) return reject(error);
           resolve(result);

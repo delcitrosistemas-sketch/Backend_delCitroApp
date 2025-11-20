@@ -26,7 +26,7 @@ export class DocumentosCalidadController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', { storage: multer.memoryStorage() }))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
-    const result = await this.cloudinaryService.uploadStream(file);
+    const result = await this.cloudinaryService.uploadDocument(file);
     return {
       message: 'Subida completada',
       url: result.secure_url,

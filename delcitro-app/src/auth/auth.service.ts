@@ -36,7 +36,6 @@ export class AuthService {
   }
 
   async signinLocal(dto: AuthDto): Promise<Tokens> {
-    console.log('1. Iniciando signinLocal para:', dto.usuario);
 
     const user = await this.prisma.uSUARIOS.findUnique({
       where: {
@@ -59,28 +58,21 @@ export class AuthService {
       },
     });
 
-    console.log('2. Usuario encontrado:', user);
-
     if (!user) {
-      console.log('3. Usuario no existe:', dto.usuario);
       throw new ForbiddenException('Usuario o contraseña incorrectos');
     }
 
     const passwordMatches = await bcrypt.compare(dto.password, user.hash);
-    console.log('4. Coincidencia de contraseña:', passwordMatches);
 
     if (!passwordMatches) {
-      console.log('5. Contraseña incorrecta para usuario:', dto.usuario);
       throw new ForbiddenException('Usuario o contraseña incorrectos');
     }
 
-    console.log('6. Permisos del usuario:', user.permisos);
     const userPermissions = await this.getUserPermissions(user);
 
     const tokens = await this.getTokens(user.id, user.usuario, userPermissions);
     await this.updateRtHash(user.id, tokens.refresh_token);
 
-    console.log('7. Login exitoso para:', dto.usuario);
 
     return tokens;
   }
