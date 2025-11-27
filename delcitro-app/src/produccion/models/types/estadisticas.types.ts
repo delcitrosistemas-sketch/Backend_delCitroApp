@@ -41,6 +41,16 @@ export interface EstadisticaPorStatus {
   cantidad: number;
 }
 
+export interface EstadisticaPorDestino {
+  destino: string;
+  cantidad: number;
+  cantidadMesActual: number;
+  porcentaje: number;
+  porcentajeMesActual: number;
+  mesActual: string;
+  tendencia: 'ascendente' | 'descendente' | 'estable';
+}
+
 export interface EstadisticasCompletas {
   mensual: EstadisticaMensual[];
   diario: EstadisticaDiaria[];
@@ -49,6 +59,7 @@ export interface EstadisticasCompletas {
   porTipo: EstadisticaPorTipo[];
   porVariedad: EstadisticaPorVariedad[];
   porStatus: EstadisticaPorStatus[];
+  porDestino: EstadisticaPorDestino[];
   totalHoy: number;
   resumen: {
     totalProcesos: number;

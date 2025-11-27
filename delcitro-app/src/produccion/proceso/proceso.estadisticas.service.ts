@@ -24,7 +24,9 @@ export class EstadisticasProcesoService {
         estadisticasPorTipo,
         estadisticasPorVariedad,
         estadisticasPorStatus,
+        estadisticasPorDestino,
         totalProcesosHoy,
+        ultimos12meses,
       ] = await Promise.all([
         this.getEstadisticasMensuales(),
         this.getEstadisticasDiarias(),
@@ -33,7 +35,9 @@ export class EstadisticasProcesoService {
         this.getEstadisticasPorTipoProceso(),
         this.getEstadisticasPorVariedad(),
         this.getEstadisticasPorStatus(),
+        this.getEstadisticasPorDestino(),
         this.getTotalProcesosHoy(),
+        this.getRegistrosUltimos12Meses(),
       ]);
 
       return {
@@ -44,7 +48,9 @@ export class EstadisticasProcesoService {
         porTipo: estadisticasPorTipo,
         porVariedad: estadisticasPorVariedad,
         porStatus: estadisticasPorStatus,
+        porDestino: estadisticasPorDestino,
         totalHoy: totalProcesosHoy,
+        ultimos_meses: ultimos12meses,
         resumen: {
           totalProcesos: await this.prisma.rEGISTRO_PROCESO.count(),
           promedioDiario: await this.calcularPromedioDiario(),
@@ -132,7 +138,7 @@ export class EstadisticasProcesoService {
   async getEstadisticasMensualAnual(): Promise<EstadisticaMensualAnual[]> {
     const fechaFin = new Date();
     const fechaInicio = new Date();
-    fechaInicio.setMonth(fechaInicio.getMonth() - 59); // Últimos 60 meses
+    fechaInicio.setMonth(fechaInicio.getMonth() - 12); // Últimos 12 meses
 
     const resultados = await this.prisma.rEGISTRO_PROCESO.groupBy({
       by: ['fecha'],
@@ -373,7 +379,91 @@ export class EstadisticasProcesoService {
     });
   }
 
-  // Métodos auxiliares
+  async getEstadisticasPorDestino() {
+    const ahora = new Date();
+    const añoActual = ahora.getFullYear();
+    const mesActual = ahora.getMonth() + 1;
+
+    const todosResultados = await this.prisma.rEGISTRO_PROCESO.groupBy({
+      by: ['destino'],
+      _count: {
+        id: true,
+      },
+      orderBy: {
+        _count: {
+          id: 'desc',
+        },
+      },
+    });
+
+    const resultados = todosResultados
+      .filter(item => item.destino !== null && item.destino !== '')
+      .slice(0, 10);
+
+    const todosMesActual = await this.prisma.rEGISTRO_PROCESO.groupBy({
+      by: ['destino'],
+      _count: {
+        id: true,
+      },
+      where: {
+        fecha: {
+          gte: new Date(añoActual, mesActual - 1, 1),
+          lt: new Date(añoActual, mesActual, 1),
+        },
+      },
+    });
+
+    const resultadosMesActual = todosMesActual.filter(item => item.destino !== null && item.destino !== '');
+
+    if (resultados.length === 0) {
+      return [];
+    }
+
+    const totalGeneral = resultados.reduce((sum, item) => sum + item._count.id, 0);
+    const totalMesActual = resultadosMesActual.reduce((sum, item) => sum + item._count.id, 0);
+
+    return resultados.map((item) => {
+      const destinoMesActual = resultadosMesActual.find(v => v.destino === item.destino);
+      const cantidadMesActual = destinoMesActual?._count.id || 0;
+
+      const porcentajeGeneral = totalGeneral > 0 ? (item._count.id / totalGeneral) * 100 : 0;
+      const porcentajeMesActual = totalMesActual > 0 ? (cantidadMesActual / totalMesActual) * 100 : 0;
+
+      return {
+        destino: item.destino || 'Sin Destino',
+        cantidad: item._count.id,
+        cantidadMesActual: cantidadMesActual,
+        porcentaje: Math.round(porcentajeGeneral * 100) / 100,
+        porcentajeMesActual: Math.round(porcentajeMesActual * 100) / 100,
+        mesActual: `${mesActual}/${añoActual}`,
+        tendencia: this.calcularTendenciaDestino(
+          item._count.id,
+          cantidadMesActual,
+          totalGeneral,
+          totalMesActual,
+        ),
+      };
+    });
+  }
+
+  private calcularTendenciaDestino(
+    cantidadTotal: number,
+    cantidadMesActual: number,
+    totalGeneral: number,
+    totalMesActual: number,
+  ): 'ascendente' | 'descendente' | 'estable' {
+    if (totalGeneral === 0 || totalMesActual === 0) return 'estable';
+
+    const porcentajeHistorico = (cantidadTotal / totalGeneral) * 100;
+    const porcentajeActual = (cantidadMesActual / totalMesActual) * 100;
+
+    const diferencia = porcentajeActual - porcentajeHistorico;
+
+    if (diferencia > 5) return 'ascendente';
+    if (diferencia < -5) return 'descendente';
+    return 'estable';
+  }
+
   private async calcularPromedioDiario(): Promise<number> {
     const primerProceso = await this.prisma.rEGISTRO_PROCESO.findFirst({
       orderBy: {
@@ -432,5 +522,83 @@ export class EstadisticasProcesoService {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  }
+
+  async getRegistrosUltimos12Meses(): Promise<EstadisticaMensualAnual[]> {
+    try {
+      const fechaFin = new Date();
+      const fechaInicio = new Date();
+      fechaInicio.setFullYear(fechaInicio.getFullYear() - 1); // Últimos 12 meses
+
+      // Obtener datos reales de la base de datos
+      const resultados = await this.prisma.rEGISTRO_PROCESO.groupBy({
+        by: ['fecha'],
+        _count: {
+          id: true,
+        },
+        where: {
+          fecha: {
+            gte: fechaInicio,
+            lte: fechaFin,
+          },
+        },
+        orderBy: {
+          fecha: 'asc',
+        },
+      });
+
+      const mesesMap: { [key: string]: EstadisticaMensualAnual } = {};
+
+      for (let i = 0; i < 12; i++) {
+        const tempDate = new Date();
+        tempDate.setMonth(tempDate.getMonth() - i);
+        const año = tempDate.getFullYear();
+        const mes = tempDate.getMonth() + 1;
+        const clave = `${año}-${mes.toString().padStart(2, '0')}`;
+
+        const fechaMes = new Date(año, mes - 1, 1);
+        const nombreMes = fechaMes.toLocaleDateString('es-ES', {
+          month: 'long',
+          year: 'numeric',
+        });
+        const nombreCorto = fechaMes.toLocaleDateString('es-ES', {
+          month: 'short',
+          year: '2-digit',
+        });
+
+        mesesMap[clave] = {
+          año: año,
+          mes: mes,
+          nombre: nombreMes,
+          nombreCorto: nombreCorto,
+          cantidad: 0,
+          fechaCompleta: fechaMes,
+          periodo: clave,
+        };
+      }
+
+      // Llenar con datos reales
+      resultados.forEach((item) => {
+        const fecha = new Date(item.fecha);
+        const año = fecha.getFullYear();
+        const mes = fecha.getMonth() + 1;
+        const clave = `${año}-${mes.toString().padStart(2, '0')}`;
+
+        if (mesesMap[clave]) {
+          mesesMap[clave].cantidad += item._count.id;
+        }
+      });
+
+      // Convertir a array y ordenar cronológicamente (más antiguo primero)
+      const mesesArray = Object.values(mesesMap).sort((a, b) => {
+        if (a.año !== b.año) return a.año - b.año;
+        return a.mes - b.mes;
+      });
+
+      return mesesArray;
+    } catch (error) {
+      console.error('Error en getRegistrosUltimos12Meses:', error);
+      throw new Error(`Error al obtener registros de últimos 12 meses: ${error.message}`);
+    }
   }
 }

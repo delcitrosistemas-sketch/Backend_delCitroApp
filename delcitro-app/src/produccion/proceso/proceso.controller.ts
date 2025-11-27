@@ -108,7 +108,10 @@ export class ProcesoController {
   getEstadisticasDiarias() {
     return this.estadisticasService.getEstadisticasDiarias();
   }
-
+  @Get('/estadisticas/12meses')
+  getEstadisticas12meses() {
+    return this.estadisticasService.getRegistrosUltimos12Meses();
+  }
   @Get('/estadisticas/anual')
   getEstadisticasAnuales() {
     return this.estadisticasService.getEstadisticasAnuales();
@@ -131,6 +134,11 @@ export class ProcesoController {
   @Get('/estadisticas/status')
   getEstadisticasPorStatus() {
     return this.estadisticasService.getEstadisticasPorStatus();
+  }
+
+  @Get('/estadisticas/destino')
+  getEstadisticasPorDestino() {
+    return this.estadisticasService.getEstadisticasPorDestino();
   }
 
   @Get('/estadisticas/hoy')
